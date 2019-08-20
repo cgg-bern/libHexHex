@@ -484,8 +484,12 @@ private:
                     auto tmp_d = d;
 
                     // rotate backwards as far as possible or back to d
+                    int steps = 0;
                     do
                     {
+                        if (++steps>50)
+                            break;
+
                         if ((tmp_d->getAlpha<1>() == nullptr) || (tmp_d->getAlpha<1>()->getAlpha<0>() == nullptr))
                             break;
 
