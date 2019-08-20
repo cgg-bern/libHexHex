@@ -62,6 +62,14 @@ add_library (HexExStatic STATIC ${SOURCES})
 target_link_libraries (HexEx ${LIBRARIES} OpenVolumeMesh)
 target_link_libraries (HexExStatic ${LIBRARIES} OpenVolumeMesh)
 
+set_source_files_properties(${CMAKE_CURRENT_LIST_DIR}/src/predicates.c
+    PROPERTIES
+    # make "if MSVC" work
+    COMPILE_DEFINITIONS "$<$<CXX_COMPILER_ID:MSVC>:MSVC=1>"
+# Shewchuk's predicates.c use some old-style C, we don't need warnings about it:
+    COMPILE_FLAGS "$<$<CXX_COMPILER_ID:MSVC>:/wd4131>"
+    )
+
 #
 # In order for the exact predicates to work the compiler
 # must not generate x87 FPU code as this leads to the use
