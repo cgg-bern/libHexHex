@@ -59,8 +59,8 @@ link_directories (${CMAKE_BINARY_DIR} ${LIBRARY_DIRS} )
 add_library (HexEx SHARED ${SOURCES})
 add_library (HexExStatic STATIC ${SOURCES})
 
-target_link_libraries (HexEx ${LIBRARIES} OpenVolumeMesh::OpenVolumeMesh)
-target_link_libraries (HexExStatic ${LIBRARIES} OpenVolumeMesh::OpenVolumeMesh)
+target_link_libraries (HexEx ${LIBRARIES} OpenVolumeMesh)
+target_link_libraries (HexExStatic ${LIBRARIES} OpenVolumeMesh)
 
 #
 # In order for the exact predicates to work the compiler
