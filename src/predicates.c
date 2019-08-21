@@ -116,7 +116,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#if MSVC
+#if defined(_WIN32) && !defined(_WIN64)
 #include <float.h>
 #pragma fenv_access (on)
 #endif
@@ -516,7 +516,7 @@ void exactinit()
   REAL check, lastcheck;
   int every_other;
 
-#if MSVC
+#if defined(_WIN32) && !defined(_WIN64)
   /*
    * In Visual Studio make sure that no internal extended precision is used.
    * This isn't necessary for gcc as long as you use the supplied CMakeLists.txt
