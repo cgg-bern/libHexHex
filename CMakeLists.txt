@@ -39,36 +39,36 @@ endif()
 
 if(EXISTS "${CMAKE_CURRENT_LIST_DIR}/OpenVolumeMesh")
   add_subdirectory(OpenVolumeMesh)
-  message("Building with OpenVolumeMesh")
+  message("Building with local OpenVolumeMesh")
 else()
-  message("Not Building with OpenVolumeMesh")
+  message("Not building with local OpenVolumeMesh")
 endif()
 
 find_package (OpenVolumeMesh REQUIRED)
 
 
-add_definitions(-DINCLUDE_TEMPLATES)
-
-set (SOURCES "")
-set (INCLUDE_DIRS "")
-set (LIBRARIES "")
-set (LIBRARY_DIRS "")
-
 set(SOURCE_FILES
-src/Dart.cc
-src/DerivedExactPredicates.cc
-src/Direction.cc
-src/FileAccessor.cc
-src/GridIsomorphism.cc
-src/HexEx.cc
-src/HexExtractor.cc
-src/HPort.cc
-src/MergePosition.cc
-src/Utils.cc
-src/predicates.c)
+    src/Dart.cc
+    src/DerivedExactPredicates.cc
+    src/Direction.cc
+    src/FileAccessor.cc
+    src/GridIsomorphism.cc
+    src/HexEx.cc
+    src/HexExtractor.cc
+    src/HPort.cc
+    src/MergePosition.cc
+    src/Utils.cc
+    src/predicates.c)
 
 add_library (HexEx ${SOURCE_FILES})
 target_link_libraries (HexEx OpenVolumeMesh::OpenVolumeMesh)
+
+target_compile_definitions(HexEx
+    PUBLIC
+        "INCLUDE_TEMPLATES"
+        "$<$<CXX_COMPILER_ID:MSVC>:NOMINMAX>"
+        "$<$<CXX_COMPILER_ID:MSVC>:_USE_MATH_DEFINES>"
+    )
 
 set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/predicates.c
     PROPERTIES
@@ -88,20 +88,19 @@ set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/predicates.c
 # forcing the generation of SSE code ensures that the
 # exact predicates produce correct results.
 #
-set (HEXEX_COMPILE_FLAGS "-Wall")
+
+target_compile_options(HexEx
+    PUBLIC
+    $<$<CXX_COMPILER_ID:Clang>:-msse -mfpmath=sse>
+    $<$<CXX_COMPILER_ID:AppleClang>:-msse -mfpmath=sse>
+    $<$<CXX_COMPILER_ID:GNU>:-msse -mfpmath=sse>
+)
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-    set (HEXEX_COMPILE_FLAGS "${HEXEX_COMPILE_FLAGS} -msse -mfpmath=sse" )
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-    set (HEXEX_COMPILE_FLAGS "${HEXEX_COMPILE_FLAGS} -msse -mfpmath=sse -pedantic -Wextra")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
-    message (WARNING
-        "You are using an Intel compiler which might generate x87 FPU code "
-        "that breaks the exact predicates. If you know which compiler flags "
-        "ensure that the Intel compiler produces SSE code, please patch "
-        "the CMakeLists.txt and inform the author <lyon@cs.rwth-aachen.de>.")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-	# There is code in exactinit() that should make sure that nor
-	# x87 extended internal precision is used.
+    # There is code in exactinit() that should make sure that nor
+    # x87 extended internal precision is used.
 else ()
     message (WARNING
         "You are using an unknown compiler which might generate x87 FPU code "
@@ -117,11 +116,15 @@ if (STL_RANGE_CHECKS)
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC" )
 endif()
 
-set_target_properties (HexEx
-    PROPERTIES
-    COMPILE_FLAGS "${HEXEX_COMPILE_FLAGS}"
-    DEFINE_SYMBOLS "-DHEXEX_EXPORT_SYMBOLS"
-    CXX_STANDARD 11
+
+target_compile_options(HexEx
+    PUBLIC
+    "$<$<CXX_COMPILER_ID:MSVC>:/bigobj>"
+    "$<$<CXX_COMPILER_ID:MSVC>:/Zc:__cplusplus>" # Enable updated __cplusplus macro
+
+    PRIVATE
+    "$<$<CXX_COMPILER_ID:GNU>:-Wall>"
+    "$<$<CXX_COMPILER_ID:Clang>:-Wall;-Wno-c++98-compat;-Wno-c++98-compat-pedantic;-Wno-weak-vtables;-Wno-padded;-Wno-sign-conversion;-Wno-missing-prototypes>"
     )
 
 target_include_directories(HexEx
@@ -130,36 +133,22 @@ target_include_directories(HexEx
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
         )
 
-set_target_properties (HexExStatic
+set_target_properties (HexEx
     PROPERTIES
-    COMPILE_FLAGS "${HEXEX_COMPILE_FLAGS}"
-    DEFINE_SYMBOLS "-DHEXEX_EXPORT_SYMBOLS"
     CXX_STANDARD 11
+    CXX_STANDARD_REQUIRED YES
+    CXX_EXTENSIONS NO
+    POSITION_INDEPENDENT_CODE ON
+    # TODO: turn this on once we have HEXEX_EXPORT macros in all required places:
+    #CXX_VISIBILITY_PRESET hidden
     )
-set_property(TARGET HexExStatic PROPERTY POSITION_INDEPENDENT_CODE ON)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 
-#
-# Fake successful finder run if compiling as a dependent project.
-#
-if(NOT "${PROJECT_NAME}" MATCHES "HexEx")
-    set (HEXEX_FOUND true PARENT_SCOPE)
-    set (HEXEX_LIBRARIES HexEx PARENT_SCOPE)
-    set (HEXEX_LIBRARY HexEx PARENT_SCOPE)
-    set (HEXEX_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/src/" PARENT_SCOPE)
-    set (HEXEX_LIBRARY_DIR "${CMAKE_CURRENT_BINARY_DIR}" CACHE PATH "The directory where the HexEx libraries can be found.")
-endif()
-
-if("${PROJECT_NAME}" MATCHES "HexEx")
+if(HEXEX_STANDALONE_BUILD)
    add_subdirectory(demo/cmdline_tool)
    add_subdirectory(demo/minimum_example)
 endif()
 
-#if ( NOT DEFINED HEXEX_BUILD_UNIT_TESTS)
-#  set( HEXEX_BUILD_UNIT_TESTS false CACHE BOOL "Enable or disable unit test builds in HexEx." )
-#endif()
-#add_subdirectory (unittests)
 
 set(HEXEX_BUILD_UNIT_TESTS false CACHE BOOL "Whether to build the unit tests.")
 if (HEXEX_BUILD_UNIT_TESTS)
@@ -169,13 +158,5 @@ if (HEXEX_BUILD_UNIT_TESTS)
 endif()
 
 
-#find_package(Doxygen)
-#if (DOXYGEN_FOUND)
-#    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/doc/Doxyfile @ONLY)
-#    add_custom_target(qex_doc
-#        ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/doc/Doxyfile
-#        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/doc
-#        COMMENT "Generating Doxygen documentation" VERBATIM)
-#endif()
 
 #list(REMOVE_AT CMAKE_MODULE_PATH -1)

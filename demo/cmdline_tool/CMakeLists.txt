@@ -23,42 +23,12 @@ cmake_minimum_required(VERSION 3.4)
 
 find_package (OpenVolumeMesh REQUIRED)
 
-# disable OpenVolumeMesh debug output
-add_definitions(-DNDEBUG)
+add_executable (cmdline_tool main.cc)
+target_link_libraries(cmdline_tool OpenVolumeMesh::OpenVolumeMesh HexEx)
+# disable OpenVolumeMesh debug output:
+target_compile_definitions(cmdline_tool PUBLIC NDEBUG)
 
-set (CMDLINE_TOOL_SOURCES "")
-set (CMDLINE_TOOL_INCLUDE_DIRS "")
-set (CMDLINE_TOOL_LIBRARIES "")
-set (CMDLINE_TOOL_LIBRARY_DIRS "")
-
-list (APPEND CMDLINE_TOOL_SOURCES main.cc)
-list (APPEND CMDLINE_TOOL_INCLUDE_DIRS
-    ${OPENVOLUMEMESH_INCLUDE_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../src
-    ${HEXEX_INCLUDE_DIRS}
-)
-list (APPEND CMDLINE_TOOL_LIBRARIES
-    ${OPENVOLUMEMESH_LIBRARY}
-    HexExStatic
-)
-
-list (APPEND CMDLINE_TOOL_LIBRARY_DIRS ${OPENVOLUMEMESH_LIBRARY_DIR})
-
-add_executable (cmdline_tool ${CMDLINE_TOOL_SOURCES})
-
-LINK_DIRECTORIES(cmdline_tool ${CMDLINE_TOOL_LIBRARY_DIRS} )
-target_link_libraries(cmdline_tool ${CMDLINE_TOOL_LIBRARIES})
-
-if ( NOT WIN32 )
-  # Set compiler flags
-  if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    set_target_properties(cmdline_tool PROPERTIES COMPILE_FLAGS "-Wno-long-long")
-  else()
-    set_target_properties(cmdline_tool PROPERTIES COMPILE_FLAGS "-pedantic -Wno-long-long")
-  endif()
-endif()
-
-set_target_properties(cmdline_tool
-    PROPERTIES
-    INCLUDE_DIRECTORIES "${CMDLINE_TOOL_INCLUDE_DIRS}"
-)
+target_compile_options(cmdline_tool PUBLIC
+    $<$<CXX_COMPILER_ID:Clang>:-Wno-long-long>
+    $<$<CXX_COMPILER_ID:GNU>:-pedantic -Wno-long-long>
+    )
