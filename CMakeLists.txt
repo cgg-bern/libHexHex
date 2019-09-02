@@ -1,42 +1,41 @@
- #
 # Copyright 2013 Computer Graphics Group, RWTH Aachen University
 # Authors: Hans-Christian Ebke <ebke@cs.rwth-aachen.de>
 #          Max Lyon <lyon@cs.rwth-aachen.de>
 #
 # This file is part of HexEx.
-# 
+#
 # HexEx is free software: you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free
 # Software Foundation, either version 3 of the License, or (at your
 # option) any later version.
-# 
+#
 # HexEx is distributed in the hope that it will be useful, but WITHOUT ANY
 # WARRANTY; without even the implied warranty of MERCHANTABILITY or
 # FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
 # for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with HexEx.  If not, see <http://www.gnu.org/licenses/>.
-#   
+#
 
-cmake_minimum_required (VERSION 2.6)
+cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
+cmake_policy(VERSION 3.12.0)
 
-# Only set project name if not build from within another project.
-if("${PROJECT_NAME}" STREQUAL "")
-    project (HexEx)
+project (HexEx
+    VERSION 1.0.0
+    LANGUAGES CXX C
+    HOMEPAGE_URL https://www.graphics.rwth-aachen.de/software/libHexEx
+    )
+
+
+if( ${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_SOURCE_DIR} )
+    set(HEXEX_STANDALONE_BUILD TRUE)
+else()
+    set(HEXEX_STANDALONE_BUILD FALSE)
 endif()
 
 list (APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
-add_definitions(-DINCLUDE_TEMPLATES)
-
-set (SOURCES "")
-set (INCLUDE_DIRS "")
-set (LIBRARIES "")
-set (LIBRARY_DIRS "")
-
-
-file(GLOB SRCS "${CMAKE_CURRENT_LIST_DIR}/src/*.cc" "${CMAKE_CURRENT_LIST_DIR}/src/*.c")
 
 if(EXISTS "${CMAKE_CURRENT_LIST_DIR}/OpenVolumeMesh")
   add_subdirectory(OpenVolumeMesh)
@@ -47,22 +46,31 @@ endif()
 
 find_package (OpenVolumeMesh REQUIRED)
 
-list (APPEND SOURCES ${SRCS})
-list (APPEND INCLUDE_DIRS ${OPENVOLUMEMESH_INCLUDE_DIR})
-list (APPEND LIBRARY_DIRS ${OPENVOLUMEMESH_LIBRARY_DIR})
-list (APPEND LIBRARIES ${OPENVOLUMEMESH_LIBRARY})
 
-include_directories (${INCLUDE_DIRS})
+add_definitions(-DINCLUDE_TEMPLATES)
 
-link_directories (${CMAKE_BINARY_DIR} ${LIBRARY_DIRS} )
+set (SOURCES "")
+set (INCLUDE_DIRS "")
+set (LIBRARIES "")
+set (LIBRARY_DIRS "")
 
-add_library (HexEx SHARED ${SOURCES})
-add_library (HexExStatic STATIC ${SOURCES})
+set(SOURCE_FILES
+src/Dart.cc
+src/DerivedExactPredicates.cc
+src/Direction.cc
+src/FileAccessor.cc
+src/GridIsomorphism.cc
+src/HexEx.cc
+src/HexExtractor.cc
+src/HPort.cc
+src/MergePosition.cc
+src/Utils.cc
+src/predicates.c)
 
-target_link_libraries (HexEx ${LIBRARIES} OpenVolumeMesh)
-target_link_libraries (HexExStatic ${LIBRARIES} OpenVolumeMesh)
+add_library (HexEx ${SOURCE_FILES})
+target_link_libraries (HexEx OpenVolumeMesh::OpenVolumeMesh)
 
-set_source_files_properties(${CMAKE_CURRENT_LIST_DIR}/src/predicates.c
+set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/predicates.c
     PROPERTIES
     # make "if MSVC" work
     COMPILE_DEFINITIONS "$<$<CXX_COMPILER_ID:MSVC>:MSVC=1>"
@@ -117,11 +125,6 @@ set_target_properties (HexEx
     )
 
 target_include_directories(HexEx
-        INTERFACE
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
-        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
-        )
-target_include_directories(HexExStatic
         INTERFACE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
