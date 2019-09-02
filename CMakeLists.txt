@@ -34,7 +34,7 @@ else()
     set(HEXEX_STANDALONE_BUILD FALSE)
 endif()
 
-list (APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
+#list (APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
 
 if(EXISTS "${CMAKE_CURRENT_LIST_DIR}/OpenVolumeMesh")
@@ -164,7 +164,7 @@ endif()
 set(HEXEX_BUILD_UNIT_TESTS false CACHE BOOL "Whether to build the unit tests.")
 if (HEXEX_BUILD_UNIT_TESTS)
     enable_testing()
-    find_package(GoogleTest REQUIRED)
+    find_package(GTest REQUIRED)
     add_subdirectory(tests)
 endif()
 
@@ -178,4 +178,4 @@ endif()
 #        COMMENT "Generating Doxygen documentation" VERBATIM)
 #endif()
 
-list(REMOVE_AT CMAKE_MODULE_PATH -1)
+#list(REMOVE_AT CMAKE_MODULE_PATH -1)
