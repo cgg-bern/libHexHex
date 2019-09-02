@@ -921,14 +921,14 @@ bool HexExtractor::traceDart2(Dart& dart)
 
         if (!transitionFace.is_valid()) {
             HEXEX_DEBUG_ONLY(std::cout << "failed to find alpha0NextFace" << std::endl;)
-            assert(false);
+            //assert(false);
             return false;
         }
 
         if (isFaceDegenerate(transitionFace))
         {
             HEXEX_DEBUG_ONLY(std::cout << "error in next connection" << std::endl;)
-            assert(false);
+            //assert(false);
             return false;
         }
 
@@ -1394,7 +1394,7 @@ HalfFaceHandle HexExtractor::alpha0NextFace(HalfFaceHandle prevFace, CellHandle 
                 if (alpha0FaceTest(hfh, param, traceDir, refDir, normalDir))
                     return hfh;
 
-    assert(false);
+    //assert(false);
 
     return HalfFaceHandle();
 }
@@ -1497,7 +1497,7 @@ HalfFaceHandle HexExtractor::alpha1NextFace(HalfFaceHandle prevFace, CellHandle 
                 if (alpha1FaceTest(hfh, param, traceDir, refDir, normalDir))
                     return hfh;
 
-    assert(false);
+    //assert(false);
 
     return HalfFaceHandle();
 }
@@ -1733,7 +1733,7 @@ HalfFaceHandle HexExtractor::alpha3NextFace(HalfFaceHandle prevFace, CellHandle 
 
 //    alpha2NextFace(prevFace, ch, param, traceDir, refDir, normalDir);
 
-    assert(false);
+    //assert(false);
     return HalfFaceHandle();
 }
 
