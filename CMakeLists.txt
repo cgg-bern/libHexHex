@@ -51,17 +51,17 @@ find_package (OpenVolumeMesh REQUIRED)
 
 
 set(SOURCE_FILES
-    src/Dart.cc
-    src/DerivedExactPredicates.cc
-    src/Direction.cc
-    src/FileAccessor.cc
-    src/GridIsomorphism.cc
-    src/HexEx.cc
-    src/HexExtractor.cc
-    src/HPort.cc
-    src/MergePosition.cc
-    src/Utils.cc
-    src/predicates.c)
+    src/HexEx/Dart.cc
+    src/HexEx/DerivedExactPredicates.cc
+    src/HexEx/Direction.cc
+    src/HexEx/FileAccessor.cc
+    src/HexEx/GridIsomorphism.cc
+    src/HexEx/HexEx.cc
+    src/HexEx/HexExtractor.cc
+    src/HexEx/HPort.cc
+    src/HexEx/MergePosition.cc
+    src/HexEx/Utils.cc
+    src/HexEx/predicates.c)
 
 add_library (HexEx ${SOURCE_FILES})
 add_library (HexEx::HexEx ALIAS HexEx)
@@ -70,20 +70,21 @@ target_link_libraries (HexEx OpenVolumeMesh::OpenVolumeMesh)
 include(GenerateExportHeader)
 generate_export_header(HexEx
     BASE_NAME HEXEX
-    EXPORT_FILE_NAME "src/Config/Export.hh"
+    EXPORT_FILE_NAME "src/HexEx/Config/Export.hh"
     DEPRECATED_MACRO_NAME "CMAKE_HEXEX_DEPRECATED"
     NO_DEPRECATED_MACRO_NAME "CMAKE_HEXEX_NO_DEPRECATED"
 )
 
 configure_file (
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/Config/Version.hh.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/src/Config/Version.hh"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/HexEx/Config/Version.hh.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/src/HexEx/Config/Version.hh"
 )
 
 
 target_include_directories(HexEx
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/HexEx> # get rid of this one some time
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/src>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
@@ -107,7 +108,7 @@ target_compile_definitions(HexEx
         "$<$<CXX_COMPILER_ID:MSVC>:_USE_MATH_DEFINES>"
     )
 
-set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/predicates.c
+set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/HexEx/predicates.c
     PROPERTIES
     # make "if MSVC" work
     COMPILE_DEFINITIONS "$<$<CXX_COMPILER_ID:MSVC>:MSVC=1>"
@@ -190,12 +191,12 @@ install(FILES
 
 
 install(DIRECTORY
-    "${CMAKE_CURRENT_BINARY_DIR}/src/Config"
+    "${CMAKE_CURRENT_BINARY_DIR}/src/HexEx/Config"
     DESTINATION include/HexEx)
 
 # Install Header Files
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/
-    DESTINATION include/HexEx
+    DESTINATION include
     FILES_MATCHING PATTERN "*.hh"
     )
 
