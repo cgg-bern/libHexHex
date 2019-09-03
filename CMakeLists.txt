@@ -19,6 +19,7 @@
 #
 
 cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
+cmake_policy(PUSH)
 cmake_policy(VERSION 3.12.0)
 
 project (HexEx
@@ -30,14 +31,16 @@ project (HexEx
 
 if( ${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_SOURCE_DIR} )
     set(HEXEX_STANDALONE_BUILD TRUE)
+    message("Configuring HexEx as standalone project...")
 else()
     set(HEXEX_STANDALONE_BUILD FALSE)
+    message("Configuring HexEx inside another cmake project...")
 endif()
 
 #list (APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
 
-if(EXISTS "${CMAKE_CURRENT_LIST_DIR}/OpenVolumeMesh")
+if(NOT TARGET OpenVolumeMesh AND EXISTS "${CMAKE_CURRENT_LIST_DIR}/OpenVolumeMesh")
   add_subdirectory(OpenVolumeMesh)
   message("Building with local OpenVolumeMesh")
 else()
@@ -229,5 +232,5 @@ if (HEXEX_BUILD_UNIT_TESTS)
 endif()
 
 
-
 #list(REMOVE_AT CMAKE_MODULE_PATH -1)
+cmake_policy(POP)
