@@ -61,7 +61,41 @@ set(SOURCE_FILES
     src/predicates.c)
 
 add_library (HexEx ${SOURCE_FILES})
+add_library (HexEx::HexEx ALIAS HexEx)
 target_link_libraries (HexEx OpenVolumeMesh::OpenVolumeMesh)
+
+include(GenerateExportHeader)
+generate_export_header(HexEx
+    BASE_NAME HEXEX
+    EXPORT_FILE_NAME "src/Config/Export.hh"
+    DEPRECATED_MACRO_NAME "CMAKE_HEXEX_DEPRECATED"
+    NO_DEPRECATED_MACRO_NAME "CMAKE_HEXEX_NO_DEPRECATED"
+)
+
+configure_file (
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/Config/Version.hh.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/src/Config/Version.hh"
+)
+
+
+target_include_directories(HexEx
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/src>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+)
+
+set_target_properties (HexEx PROPERTIES
+    VERSION ${HexEx_VERSION_MAJOR}.${HexEx_VERSION_MINOR}
+    SOVERSION ${HexEx_VERSION_MAJOR}.${HexEx_VERSION_MINOR}
+    CXX_STANDARD 11
+    CXX_STANDARD_REQUIRED YES
+    CXX_EXTENSIONS NO
+    POSITION_INDEPENDENT_CODE ON
+    # TODO: turn this on once we have HEXEX_EXPORT macros in all required places:
+    #CXX_VISIBILITY_PRESET hidden
+    )
+
 
 target_compile_definitions(HexEx
     PUBLIC
@@ -127,21 +161,58 @@ target_compile_options(HexEx
     "$<$<CXX_COMPILER_ID:Clang>:-Wall;-Wno-c++98-compat;-Wno-c++98-compat-pedantic;-Wno-weak-vtables;-Wno-padded;-Wno-sign-conversion;-Wno-missing-prototypes>"
     )
 
-target_include_directories(HexEx
-        INTERFACE
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
-        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
-        )
 
-set_target_properties (HexEx
-    PROPERTIES
-    CXX_STANDARD 11
-    CXX_STANDARD_REQUIRED YES
-    CXX_EXTENSIONS NO
-    POSITION_INDEPENDENT_CODE ON
-    # TODO: turn this on once we have HEXEX_EXPORT macros in all required places:
-    #CXX_VISIBILITY_PRESET hidden
+include(CMakePackageConfigHelpers)
+include(GNUInstallDirs)
+
+
+set(INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR}/cmake/HexEx)
+
+configure_package_config_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/HexExConfig.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/HexExConfig.cmake"
+    INSTALL_DESTINATION ${INSTALL_CONFIGDIR}
     )
+
+write_basic_package_version_file(
+    HexExConfigVersion.cmake
+    VERSION ${PROJECT_VERSION}
+    COMPATIBILITY SameMajorVersion
+    )
+
+install(FILES
+    "${CMAKE_CURRENT_BINARY_DIR}/HexExConfigVersion.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/HexExConfig.cmake"
+    DESTINATION ${INSTALL_CONFIGDIR})
+
+
+install(DIRECTORY
+    "${CMAKE_CURRENT_BINARY_DIR}/HexEx/Config"
+    DESTINATION include/HexEx)
+
+# Install Header Files
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src
+    DESTINATION include
+    FILES_MATCHING PATTERN "*.hh"
+    )
+
+install(TARGETS HexEx
+    EXPORT HexExTargets
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
+
+install(EXPORT HexExTargets
+    FILE HexExTargets.cmake
+    NAMESPACE HexEx::
+    DESTINATION ${INSTALL_CONFIGDIR}
+)
+
+export(EXPORT HexExTargets
+    NAMESPACE HexEx::)
+export(PACKAGE HexEx)
+
 
 
 if(HEXEX_STANDALONE_BUILD)

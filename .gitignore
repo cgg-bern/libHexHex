@@ -9,3 +9,4 @@
 # gcov output files:
 *.gcda
 *.gcno
+/OpenVolumeMesh/
