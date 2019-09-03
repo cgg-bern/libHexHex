@@ -27,6 +27,7 @@
 #include "Utils.hh"
 #include "MeshConversion.hh"
 #include "ExactPredicates.hh"
+#include "HexEx/Config/Export.hh"
 
 namespace HexEx {
 
@@ -37,7 +38,7 @@ namespace HexEx {
 #endif
 
 
-class HexExtractor
+class HEXEX_EXPORT HexExtractor
 {
 
     friend Dart;
