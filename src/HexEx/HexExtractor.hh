@@ -27,6 +27,7 @@
 #include "Utils.hh"
 #include "MeshConversion.hh"
 #include "ExactPredicates.hh"
+#include "HexEx/Config/Export.hh"
 
 namespace HexEx {
 
@@ -37,7 +38,7 @@ namespace HexEx {
 #endif
 
 
-class HexExtractor
+class HEXEX_EXPORT HexExtractor
 {
 
     friend Dart;
@@ -429,9 +430,11 @@ private:
                     if (localCellUVs[ch].find(*cv_it) == localCellUVs[ch].end())
                         continue;
                     auto localUV = localCellUVs[ch][*cv_it];
+                    /*
                     assert((localUV[0] == 0) || (localUV[0] == 1));
                     assert((localUV[1] == 0) || (localUV[1] == 1));
                     assert((localUV[2] == 0) || (localUV[2] == 1));
+                    */
 
                     if (!((localUV[0] == 0) || (localUV[0] == 1)) ||
                             !((localUV[1] == 0) || (localUV[1] == 1)) ||

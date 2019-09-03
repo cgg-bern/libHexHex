@@ -23,43 +23,15 @@ cmake_minimum_required(VERSION 3.4)
 
 find_package (OpenVolumeMesh REQUIRED)
 
-# disable OpenVolumeMesh debug output
-add_definitions(-DNDEBUG)
+add_executable (minimum_example main.cc)
+target_link_libraries(minimum_example OpenVolumeMesh::OpenVolumeMesh HexEx)
 
-set (MINIMUM_EXAMPLE_SOURCES "")
-set (MINIMUM_EXAMPLE_INCLUDE_DIRS "")
-set (MINIMUM_EXAMPLE_LIBRARIES "")
-set (MINIMUM_EXAMPLE_LIBRARY_DIRS "")
+# disable OpenVolumeMesh debug output:
+target_compile_definitions(minimum_example PUBLIC NDEBUG)
 
-list (APPEND MINIMUM_EXAMPLE_SOURCES main.cc)
-list (APPEND MINIMUM_EXAMPLE_INCLUDE_DIRS
-    ${OPENVOLUMEMESH_INCLUDE_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../src
-    ${HEXEX_INCLUDE_DIRS}
-)
-list (APPEND MINIMUM_EXAMPLE_LIBRARIES
-    ${OPENVOLUMEMESH_LIBRARY}
-    HexExStatic
-)
 
-list (APPEND MINIMUM_EXAMPLE_LIBRARY_DIRS ${OPENVOLUMEMESH_LIBRARY_DIR})
-
-add_executable (minimum_example ${MINIMUM_EXAMPLE_SOURCES})
-
-LINK_DIRECTORIES(minimum_example ${MINIMUM_EXAMPLE_LIBRARY_DIRS} )
-target_link_libraries(minimum_example ${MINIMUM_EXAMPLE_LIBRARIES})
-
-if ( NOT WIN32 )
-  # Set compiler flags
-  if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    set_target_properties(minimum_example PROPERTIES COMPILE_FLAGS "-Wno-long-long")
-  else()
-    set_target_properties(minimum_example PROPERTIES COMPILE_FLAGS "-pedantic -Wno-long-long")
-  endif()
-endif()
-
-set_target_properties(minimum_example
-    PROPERTIES
-    INCLUDE_DIRECTORIES "${MINIMUM_EXAMPLE_INCLUDE_DIRS}"
-)
+target_compile_options(minimum_example PUBLIC
+    $<$<CXX_COMPILER_ID:Clang>:-Wno-long-long>
+    $<$<CXX_COMPILER_ID:GNU>:-pedantic -Wno-long-long>
+    )
 

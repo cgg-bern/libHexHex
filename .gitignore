@@ -1,0 +1,12 @@
+/.project
+/.cproject
+/.settings
+/CMakeLists.txt.user
+/build*/
+*.swp
+*~
+
+# gcov output files:
+*.gcda
+*.gcno
+/OpenVolumeMesh/

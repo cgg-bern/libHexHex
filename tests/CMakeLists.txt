@@ -1,5 +1,3 @@
-#include (ACGCommon)
-
 if (NOT DEFINED HEXEX_INCLUDE_DIRS)
   set(HEXEX_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/src/")
 endif()
@@ -12,11 +10,7 @@ include_directories (
 
 message("HEXEX_INCLUDE_DIRS: ${HEXEX_INCLUDE_DIRS}")
 
-if ( HEXEX_BUILD_UNIT_TESTS )
-  # Search for gtest headers and libraries
-  find_package(GoogleTest)
-
-  if(GTEST_FOUND)
+if (GTEST_FOUND)
 
     enable_testing()
 
@@ -69,17 +63,16 @@ if ( HEXEX_BUILD_UNIT_TESTS )
 
 	if ( NOT WIN32 )
       #copy test files to unittest output dir
-      acg_copy_after_build(unittests ${CMAKE_CURRENT_LIST_DIR}/testdata ${OUTPUT_DIR}/testdata)
+      #acg_copy_after_build(unittests ${CMAKE_CURRENT_LIST_DIR}/testdata ${OUTPUT_DIR}/testdata)
       file(MAKE_DIRECTORY ${OUTPUT_DIR}/Results)
 	else()
       #copy test files to Build dir because in unittest output dir dlls are missing
-      acg_copy_after_build(unittests ${CMAKE_CURRENT_LIST_DIR}/testdata ${CMAKE_BINARY_DIR}/Build/testdata)
+      #acg_copy_after_build(unittests ${CMAKE_CURRENT_LIST_DIR}/testdata ${CMAKE_BINARY_DIR}/Build/testdata)
       file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/Build/Results)
 	endif()
 
   add_test(NAME AllTestsIn_HexEx_tests WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/Unittests" COMMAND "${CMAKE_BINARY_DIR}/Unittests/unittests")
 
-  else(GTEST_FOUND)
+else(GTEST_FOUND)
     message(STATUS "Google testing framework was not found, unittests disabled.")
-  endif(GTEST_FOUND)
-endif()
+endif(GTEST_FOUND)
