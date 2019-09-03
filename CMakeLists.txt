@@ -187,12 +187,12 @@ install(FILES
 
 
 install(DIRECTORY
-    "${CMAKE_CURRENT_BINARY_DIR}/HexEx/Config"
+    "${CMAKE_CURRENT_BINARY_DIR}/src/Config"
     DESTINATION include/HexEx)
 
 # Install Header Files
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src
-    DESTINATION include
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/
+    DESTINATION include/HexEx
     FILES_MATCHING PATTERN "*.hh"
     )
 
