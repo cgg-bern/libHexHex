@@ -19,7 +19,6 @@
 #
 
 cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
-cmake_policy(PUSH)
 cmake_policy(VERSION 3.12.0)
 
 project (HexEx
@@ -232,6 +231,3 @@ if (HEXEX_BUILD_UNIT_TESTS)
     add_subdirectory(tests)
 endif()
 
-
-#list(REMOVE_AT CMAKE_MODULE_PATH -1)
-cmake_policy(POP)
