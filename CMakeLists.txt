@@ -65,7 +65,7 @@ set(SOURCE_FILES
 
 add_library (HexEx ${SOURCE_FILES})
 add_library (HexEx::HexEx ALIAS HexEx)
-target_link_libraries (HexEx OpenVolumeMesh::OpenVolumeMesh)
+target_link_libraries (HexEx PUBLIC OpenVolumeMesh::OpenVolumeMesh)
 
 include(GenerateExportHeader)
 generate_export_header(HexEx
