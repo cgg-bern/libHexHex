@@ -46,7 +46,9 @@ else()
   message("Not building with local OpenVolumeMesh")
 endif()
 
-find_package (OpenVolumeMesh REQUIRED)
+if (NOT TARGET OpenVolumeMesh::OpenVolumeMesh)
+ find_package (OpenVolumeMesh REQUIRED)
+endif()
 
 
 set(SOURCE_FILES
