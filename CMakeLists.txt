@@ -128,18 +128,15 @@ set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/HexEx/predicates.c
 # exact predicates produce correct results.
 #
 
-target_compile_options(HexEx
-    PUBLIC
-    $<$<CXX_COMPILER_ID:Clang>:-msse -mfpmath=sse>
-    $<$<CXX_COMPILER_ID:AppleClang>:-msse -mfpmath=sse>
-    $<$<CXX_COMPILER_ID:GNU>:-msse -mfpmath=sse>
-)
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+if ("${CMAKE_CXX_COMPILER_ID}" MATCHES ".*Clang")
+    target_compile_options(HexEx PUBLIC -msse -mfpmath=sse)
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
+    target_compile_options(HexEx PUBLIC -msse -mfpmath=sse)
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-    # There is code in exactinit() that should make sure that nor
-    # x87 extended internal precision is used.
+    # On 64-bit platforms, MSVC is supposed to only generate x87 code for
+    #   'long double' types, not for doubles.
+    # For 32-bit platforms, there is code in exactinit() that should
+    #   make sure that no x87 extended internal precision is used.
 else ()
     message (WARNING
         "You are using an unknown compiler which might generate x87 FPU code "
