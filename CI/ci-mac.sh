@@ -9,6 +9,8 @@ LANGUAGE=$1
 PATH=$PATH:/opt/local/bin
 export PATH
 
+export GTEST_ROOT="${HOME}/sw/gtest-1.7.0"
+
 OPTIONS=""
 
 if [ "$LANGUAGE" == "C++98" ]; then
