@@ -216,7 +216,6 @@ install(EXPORT HexExTargets
 
 export(EXPORT HexExTargets
     NAMESPACE HexEx::)
-export(PACKAGE HexEx)
 
 
 
