@@ -1201,8 +1201,8 @@ bool HexExtractor::connectDartToOppositeSecondaryDart(Dart& dart)
 
         auto transitionFace = alpha3NextFace(lastFace, currentCell, currentParameter, traceDir, refDir, normalDir);
         if (!transitionFace.is_valid()) {
-            std::cerr << "tf invalid" << std::endl;
-            continue;
+            std::cerr << "tf invalid" <<lastFace<<" "<<currentCell<<" "<<currentParameter<< std::endl;
+            return false;
         }
 
         if (inputMesh.is_boundary(inputMesh.opposite_halfface_handle(transitionFace)))
