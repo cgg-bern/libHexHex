@@ -45,7 +45,7 @@ endif()
 #list (APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
 
-if(NOT TARGET OpenVolumeMesh AND EXISTS "${CMAKE_CURRENT_LIST_DIR}/OpenVolumeMesh")
+if(NOT TARGET OpenVolumeMesh::OpenVolumeMesh AND EXISTS "${CMAKE_CURRENT_LIST_DIR}/OpenVolumeMesh")
   add_subdirectory(OpenVolumeMesh)
   message("Building with local OpenVolumeMesh")
 else()

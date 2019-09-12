@@ -21,7 +21,9 @@
 
 cmake_minimum_required(VERSION 3.4)
 
-find_package (OpenVolumeMesh REQUIRED)
+if(NOT TARGET OpenVolumeMesh::OpenVolumeMesh)
+    find_package (OpenVolumeMesh REQUIRED)
+endif()
 
 add_executable (minimum_example main.cc)
 target_link_libraries(minimum_example OpenVolumeMesh::OpenVolumeMesh HexEx)
