@@ -960,7 +960,10 @@ REAL *h;
   }
   while (eindex < elen) {
     Two_Sum(Q, enow, Qnew, hh);
-    enow = e[++eindex];
+    ++eindex;
+    if (eindex < elen) {
+        enow = e[eindex];
+    }
     Q = Qnew;
     if (hh != 0.0) {
       h[hindex++] = hh;
@@ -1023,7 +1026,10 @@ REAL *h;
   if ((eindex < elen) && ((findex >= flen)
                           || ((fnow > enow) == (fnow > -enow)))) {
     Fast_Two_Sum(enow, g0, Qnew, q);
-    enow = e[++eindex];
+    ++eindex;
+    if (eindex < elen) {
+        enow = e[eindex];
+    }
   } else {
     Fast_Two_Sum(fnow, g0, Qnew, q);
     fnow = f[++findex];
@@ -1033,10 +1039,17 @@ REAL *h;
     if ((eindex < elen) && ((findex >= flen)
                             || ((fnow > enow) == (fnow > -enow)))) {
       Fast_Two_Sum(enow, q, R, h[hindex]);
-      enow = e[++eindex];
+      ++eindex;
+      if (eindex < elen) {
+        enow = e[eindex];
+      }
     } else {
       Fast_Two_Sum(fnow, q, R, h[hindex]);
-      fnow = f[++findex];
+      ++findex;
+      if (findex < flen) {
+        // XXX can fnow from f[flen] ever be used?
+        fnow = f[findex];
+      }
     }
     Two_Sum(Q, R, Qnew, q);
     Q = Qnew;
@@ -1089,7 +1102,10 @@ REAL *h;
   if ((eindex < elen) && ((findex >= flen)
                           || ((fnow > enow) == (fnow > -enow)))) {
     Fast_Two_Sum(enow, g0, Qnew, q);
-    enow = e[++eindex];
+    ++eindex;
+    if (eindex < elen) {
+        enow = e[eindex];
+    }
   } else {
     Fast_Two_Sum(fnow, g0, Qnew, q);
     fnow = f[++findex];
@@ -1099,7 +1115,10 @@ REAL *h;
     if ((eindex < elen) && ((findex >= flen)
                             || ((fnow > enow) == (fnow > -enow)))) {
       Fast_Two_Sum(enow, q, R, hh);
-      enow = e[++eindex];
+      ++eindex;
+      if (eindex < elen) {
+        enow = e[eindex];
+      }
     } else {
       Fast_Two_Sum(fnow, q, R, hh);
       fnow = f[++findex];
