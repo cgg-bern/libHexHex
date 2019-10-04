@@ -99,9 +99,6 @@ target_include_directories(HexEx
 set_target_properties (HexEx PROPERTIES
     VERSION ${HexEx_VERSION_MAJOR}.${HexEx_VERSION_MINOR}
     SOVERSION ${HexEx_VERSION_MAJOR}.${HexEx_VERSION_MINOR}
-    CXX_STANDARD 11
-    CXX_STANDARD_REQUIRED YES
-    CXX_EXTENSIONS NO
     POSITION_INDEPENDENT_CODE ON
     # TODO: turn this on once we have HEXEX_EXPORT macros in all required places:
     #CXX_VISIBILITY_PRESET hidden
