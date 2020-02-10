@@ -232,3 +232,14 @@ if (HEXEX_BUILD_UNIT_TESTS)
     add_subdirectory(tests)
 endif()
 
+#
+# Fake successful finder run if compiling as a dependent project.
+#
+if(NOT "${CMAKE_PROJECT_NAME}" MATCHES "HexEx")
+    set (HEXEX_FOUND true PARENT_SCOPE)
+    set (HEXEX_LIBRARIES HexEx PARENT_SCOPE)
+    set (HEXEX_LIBRARY HexEx PARENT_SCOPE)
+    set (HEXEX_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/src/" PARENT_SCOPE)
+    set (HEXEX_LIBRARY_DIR "${CMAKE_CURRENT_BINARY_DIR}" CACHE PATH "The directory where the HexEx libraries can be found.")
+endif()
+
