@@ -63,7 +63,7 @@ private:
 
 
     template <typename Vec>
-    Vec transformT(char i, const Vec& v) const
+    static Vec transformT(char i, const Vec& v)
     {
 //        return RestrictedRotation::matrices[i].transform_point(v);
 
