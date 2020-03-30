@@ -1101,13 +1101,13 @@ bool HexExtractor::connectDartToNeighborSecondaryDart2(Dart& dart)
         if (!transitionFace.is_valid())
         {
             HEXEX_DEBUG_ONLY(std::cout << "failed to find alpha2NextFace" << std::endl;)
-            assert(false);
+            //assert(false);
             return false;
         }
 
         if (isFaceDegenerate(transitionFace))
         {
-            assert(false);
+            //assert(false);
             return false;
         }
 
@@ -1225,7 +1225,7 @@ bool HexExtractor::connectDartToOppositeSecondaryDart(Dart& dart)
     }
 
 
-    assert(i < 2);
+    //assert(i < 2);
 
 
     auto oppositeDart = getSecondaryDart(currentCell, currentParameter, nextTraceDir, nextRefDir, nextNormalDir);
@@ -1377,7 +1377,7 @@ bool HexExtractor::alpha0FaceTest(HalfFaceHandle hfh, Parameter param, Direction
     }
     else
     {
-        assert(false);
+        //assert(false);
         return false;
     }
 
