@@ -44,9 +44,9 @@ class HPort;
 class HPortHandle
 {
 public:
-    explicit HPortHandle(std::shared_ptr<HPort> hport)
+    explicit HPortHandle(std::shared_ptr<HPort> _hport)
         :
-          hport(hport)
+          hport(_hport)
     {}
 
     HPortHandle()
