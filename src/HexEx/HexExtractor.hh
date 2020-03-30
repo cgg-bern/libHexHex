@@ -72,6 +72,7 @@ public:
         :
           HexExtractor()
     {
+        assert (!tetmesh.needs_garbage_collection());
 
         convertToHexExTetrahedralMesh(tetmesh, inputMesh);
 
