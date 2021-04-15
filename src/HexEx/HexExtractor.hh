@@ -164,6 +164,18 @@ public:
 
     void writeToFile(std::string filename);
 
+    template <typename PointT>
+    void copySanitizedParametrization(std::map<CellHandle, std::map<VertexHandle, PointT>>& parameters) {
+        sanitizeParametrization(false, false);
+
+        // copy parametrization
+        for (auto ch: inputMesh.cells())
+            for (auto cv_it = inputMesh.cv_iter(ch); cv_it.valid(); ++cv_it) {
+                auto pm = vertexParameters[ch][*cv_it];
+                parameters[ch][*cv_it] = PointT(pm[0], pm[1], pm[2]);
+            }
+    }
+
 #ifdef HEXEX_TESTING
 public:
 #else
