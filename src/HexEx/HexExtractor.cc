@@ -4415,7 +4415,7 @@ void HexExtractor::calculateDifferencesInDartTypes(CellHandle ch)
     for (auto d : darts)
     {
         if (d->getHalfface().is_valid())
-            if (intermediateHexMesh.incident_cell(d->getHalfface()).idx() != ch)
+            if (intermediateHexMesh.incident_cell(d->getHalfface()) != ch)
             {
                 HEXEX_DEBUG_ONLY(std::cout << "ERROR :( cell id: " << ch << " incident cell: " << intermediateHexMesh.incident_cell(d->getHalfface()).idx() << std::endl);
             }
