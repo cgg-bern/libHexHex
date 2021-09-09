@@ -100,6 +100,8 @@ set_target_properties (HexEx PROPERTIES
     VERSION ${HexEx_VERSION_MAJOR}.${HexEx_VERSION_MINOR}
     SOVERSION ${HexEx_VERSION_MAJOR}.${HexEx_VERSION_MINOR}
     POSITION_INDEPENDENT_CODE ON
+    AUTOMOC OFF
+    AUTOUIC OFF
     # TODO: turn this on once we have HEXEX_EXPORT macros in all required places:
     #CXX_VISIBILITY_PRESET hidden
     )
