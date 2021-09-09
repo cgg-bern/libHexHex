@@ -19,7 +19,7 @@
  */
 
 
-#include <vector>
+#include <array>
 
 #include "GridIsomorphism.hh"
 #include "Typedefs.hh"
@@ -175,7 +175,7 @@ Matrix4x4d RestrictedRotation::convertToMatrix(char i)
 {
     auto m = Matrix4x4d();
 
-    auto vecs = std::vector<Vec3d>(3, Vec3d(0,0,0));
+    std::array<Vec3d, 3> vecs {Vec3d(0.), Vec3d(0.), Vec3d(0.)};
 
     auto p = i >> 3;
     vecs[0][p] = 1;
