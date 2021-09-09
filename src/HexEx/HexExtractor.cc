@@ -199,6 +199,18 @@ void HexExtractor::extractHVertices()
 
         auto u = parameter(adjacentCell, e.from_vertex());
         auto v = parameter(adjacentCell, e.to_vertex());
+        if (std::isnan(u[0]) ||  std::isnan(u[1]) ||  std::isnan(u[2]))
+        {
+            std::cerr << "hexex: NaN in parameterisation of vertex "
+                << e.from_vertex().idx() << "." << std::endl;
+            return; // or completely abort?
+        }
+        if (std::isnan(v[0]) ||  std::isnan(v[1]) ||  std::isnan(v[2]))
+        {
+            std::cerr << "hexex: NaN in parameterisation of vertex "
+                << e.to_vertex().idx() << "." << std::endl;
+            return; // or completely abort?
+        }
 
         double start = -1;
         double end = -1;
