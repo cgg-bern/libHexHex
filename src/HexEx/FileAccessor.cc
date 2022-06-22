@@ -68,9 +68,53 @@ bool HexEx::writeToStream(std::ostream& os, TetrahedralMesh& mesh, PerCellVertex
         os << std::endl;
     }
 
-    return true;
+    // store feature information if available
+    std::vector<OpenVolumeMesh::VertexHandle> ft_vertices;
+    std::vector<OpenVolumeMesh::EdgeHandle>   ft_edges;
+    std::vector<OpenVolumeMesh::FaceHandle>   ft_faces;
 
+    // collect
+    if(mesh.template vertex_property_exists<bool>("AlgoHex::FeatureVertices")) {
+      auto feature_vprop = mesh.template request_vertex_property<bool>("AlgoHex::FeatureVertices", false);
+      for (const auto &vh: mesh.vertices())
+        if (feature_vprop[vh])
+          ft_vertices.push_back(vh);
+    }
 
+    if(mesh.template edge_property_exists<bool>("AlgoHex::FeatureEdges")) {
+    auto feature_eprop = mesh.template request_edge_property<bool>("AlgoHex::FeatureEdges", false);
+    for (const auto &eh: mesh.edges()())
+      if (feature_eprop[eh])
+        ft_edges.push_back(eh);
+    }
+
+    if(mesh.template face_property_exists<bool>("AlgoHex::FeatureFaces")) {
+      auto feature_fprop = mesh.template request_face_property<bool>("AlgoHex::FeatureFaces", false);
+      for (const auto &fh: mesh.faces()())
+        if (feature_fprop[fh])
+          ft_faces.push_back(fh);
+    }
+
+    std::cerr << "store #feature_vertices = " << ft_vertices.size()
+              << "store #feature_edges = " << ft_edges.size()
+              << "store #feature_vertices = " << ft_faces.size() << std::endl;
+
+    os << ft_vertices.size() << " " << ft_edges.size() << ft_faces.size() << std::endl;
+
+    for(const auto& vh : ft_vertices)
+      os << vh.idx() << std::endl;
+
+    for(const auto& eh : ft_edges)
+      os << mesh.edge(eh).from_vertex().idx() << " " << mesh.edge(eh).to_vertex().idx() << std::endl;
+
+    for(const auto& fh : ft_faces)
+    {
+      for(int i=0; i<3; ++i)
+        os << mesh.edge(mesh.face(fh).halfedges[i]).to_vertex().idx() << " ";
+      os << std::endl;
+    }
+
+  return true;
 }
 
 bool HexEx::readFromStream(std::istream& is, TetrahedralMesh& mesh, PerCellVertexProperty<Parameter>& parameters)
@@ -108,7 +152,66 @@ bool HexEx::readFromStream(std::istream& is, TetrahedralMesh& mesh, PerCellVerte
         parameters[ch][vh3] = param;
     }
 
-    return true;
+    // number of feature vertices/edges/faces stored in file
+    int n_ftv(0), n_fte(0), n_ftf(0);
+
+    is >> n_ftv >> n_fte >> n_ftf;
+
+    std::cerr << "read #feature_vertices = " << n_ftv
+              << "read #feature_edges = " << n_fte
+              << "read #feature_vertices = " << n_ftf << std::endl;
+
+    // request/add feature properties
+    auto feature_vprop = mesh.template request_vertex_property<bool>("AlgoHex::FeatureVertices", false);
+    auto feature_eprop  = mesh.template request_edge_property<bool>("AlgoHex::FeatureEdges", false);
+    auto feature_fprop  = mesh.template request_face_property<bool>("AlgoHex::FeatureFaces", false);
+
+    mesh.set_persistent(feature_vprop, true);
+    mesh.set_persistent(feature_eprop, true);
+    mesh.set_persistent(feature_fprop, true);
+
+    for(int i=0; i<n_ftv; ++i)
+    {
+      int vidx;
+      is >> vidx;
+      feature_vprop[OpenVolumeMesh::VertexHandle(vidx)] = true;
+    }
+
+    for(int i=0; i<n_fte; ++i)
+    {
+      int v0idx, v1idx;
+      is >> v0idx >> v1idx;
+
+      OpenVolumeMesh::HalfEdgeHandle heh = mesh.halfedge(OpenVolumeMesh::VertexHandle(v0idx),OpenVolumeMesh::VertexHandle(v1idx));
+      if(!heh.is_valid()) std::cerr << "ERROR: could not obtain feature edge stored in .hexex file " << v0idx << " " << v1idx << std::endl;
+      else
+      {
+        auto eh = mesh.edge_handle(heh);
+        feature_eprop[eh] = true;
+      }
+    }
+
+  for(int i=0; i<n_ftf; ++i)
+  {
+    int v0idx, v1idx, v2idx;
+    is >> v0idx >> v1idx >> v2idx;
+
+    // map vertex indices
+    std::vector<OpenVolumeMesh::VertexHandle> vhs;
+    vhs.push_back(OpenVolumeMesh::VertexHandle(v0idx));
+    vhs.push_back(OpenVolumeMesh::VertexHandle(v1idx));
+    vhs.push_back(OpenVolumeMesh::VertexHandle(v2idx));
+
+    // get corresponding halfface in original mesh
+    OpenVolumeMesh::HalfFaceHandle hfh = mesh.halfface(vhs);
+    if(!hfh.is_valid()) std::cerr << "ERROR: could not obtain feature face stored in .hexex file" << std::endl;
+    else
+    {
+      OpenVolumeMesh::FaceHandle fh = mesh.face_handle(hfh);
+      feature_fprop[fh] = true;
+    }
+
+  return true;
 }
 
 
