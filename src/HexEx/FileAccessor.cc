@@ -191,8 +191,7 @@ bool HexEx::readFromStream(std::istream& is, TetrahedralMesh& mesh, PerCellVerte
       }
     }
 
-  for(int i=0; i<n_ftf; ++i)
-  {
+  for(int i=0; i<n_ftf; ++i) {
     int v0idx, v1idx, v2idx;
     is >> v0idx >> v1idx >> v2idx;
 
@@ -204,12 +203,12 @@ bool HexEx::readFromStream(std::istream& is, TetrahedralMesh& mesh, PerCellVerte
 
     // get corresponding halfface in original mesh
     OpenVolumeMesh::HalfFaceHandle hfh = mesh.halfface(vhs);
-    if(!hfh.is_valid()) std::cerr << "ERROR: could not obtain feature face stored in .hexex file" << std::endl;
-    else
-    {
+    if (!hfh.is_valid()) std::cerr << "ERROR: could not obtain feature face stored in .hexex file" << std::endl;
+    else {
       OpenVolumeMesh::FaceHandle fh = mesh.face_handle(hfh);
       feature_fprop[fh] = true;
     }
+  }
 
   return true;
 }
