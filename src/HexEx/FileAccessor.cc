@@ -83,14 +83,14 @@ bool HexEx::writeToStream(std::ostream& os, TetrahedralMesh& mesh, PerCellVertex
 
     if(mesh.template edge_property_exists<bool>("AlgoHex::FeatureEdges")) {
     auto feature_eprop = mesh.template request_edge_property<bool>("AlgoHex::FeatureEdges", false);
-    for (const auto &eh: mesh.edges()())
+    for (const auto &eh: mesh.edges())
       if (feature_eprop[eh])
         ft_edges.push_back(eh);
     }
 
     if(mesh.template face_property_exists<bool>("AlgoHex::FeatureFaces")) {
       auto feature_fprop = mesh.template request_face_property<bool>("AlgoHex::FeatureFaces", false);
-      for (const auto &fh: mesh.faces()())
+      for (const auto &fh: mesh.faces())
         if (feature_fprop[fh])
           ft_faces.push_back(fh);
     }
