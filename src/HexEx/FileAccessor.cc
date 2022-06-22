@@ -105,12 +105,12 @@ bool HexEx::writeToStream(std::ostream& os, TetrahedralMesh& mesh, PerCellVertex
       os << vh.idx() << std::endl;
 
     for(const auto& eh : ft_edges)
-      os << mesh.halfedge(eh).from_vertex().idx() << " " << mesh.edge(eh).to_vertex().idx() << std::endl;
+      os << mesh.edge(eh).from_vertex().idx() << " " << mesh.edge(eh).to_vertex().idx() << std::endl;
 
     for(const auto& fh : ft_faces)
     {
       for(int i=0; i<3; ++i)
-        os << mesh.edge(mesh.face(fh).halfedges()[i]).to_vertex().idx() << " ";
+        os << mesh.halfedge(mesh.face(fh).halfedges()[i]).to_vertex().idx() << " ";
       os << std::endl;
     }
 
