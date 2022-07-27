@@ -99,10 +99,13 @@ void copy_edge_feature_tags( TetMeshT& _mesh, TetrahedralMesh& _tetMesh)
       auto vh0 = _mesh.halfedge(_mesh.halfedge_handle(eh, 0)).to_vertex();
       auto vh1 = _mesh.halfedge(_mesh.halfedge_handle(eh, 1)).to_vertex();
 
-      auto output_eh = _tetMesh.halfedge(vh0,vh1);
+      auto output_heh = _tetMesh.halfedge(vh0,vh1);
 
-      if(output_eh.is_valid())
+      if(output_heh.is_valid())
+      {
+        auto output_eh = _tetMesh.edge_handle(output_heh);
         output_efeature[output_eh] = input_efeature[eh];
+      }
       else
         std::cerr << "ERROR: copy_edge_feature_tags failed to find corresponding edge_handle" << std::endl;
     }
