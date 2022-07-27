@@ -25,9 +25,14 @@
 
 namespace HexEx {
 
+// forward declarations
+template <typename TetMeshT> void copy_feature_tags( TetMeshT& _mesh, TetrahedralMesh& _tetMesh);
+template <typename TetMeshT> void copy_vertex_feature_tags( TetMeshT& _mesh, TetrahedralMesh& _tetMesh);
+template <typename TetMeshT> void copy_edge_feature_tags( TetMeshT& _mesh, TetrahedralMesh& _tetMesh);
+template <typename TetMeshT> void copy_face_feature_tags( TetMeshT& _mesh, TetrahedralMesh& _tetMesh);
 
 template <typename TetMeshT>
-void convertToHexExTetrahedralMesh(const TetMeshT& _mesh, TetrahedralMesh& _tetMesh)
+void convertToHexExTetrahedralMesh( TetMeshT& _mesh, TetrahedralMesh& _tetMesh)
 {
     using inPoint = typename TetMeshT::PointT;
 
@@ -55,7 +60,7 @@ void convertToHexExTetrahedralMesh(const TetMeshT& _mesh, TetrahedralMesh& _tetM
 
 
 template <typename TetMeshT>
-void copy_feature_tags(const TetMeshT& _mesh, TetrahedralMesh& _tetMesh)
+void copy_feature_tags( TetMeshT& _mesh, TetrahedralMesh& _tetMesh)
 {
   copy_vertex_feature_tags(_mesh, _tetMesh);
   copy_edge_feature_tags(_mesh, _tetMesh);
@@ -63,33 +68,77 @@ void copy_feature_tags(const TetMeshT& _mesh, TetrahedralMesh& _tetMesh)
 }
 
 template <typename TetMeshT>
-void copy_vertex_feature_tags(const TetMeshT& _mesh, TetrahedralMesh& _tetMesh)
+void copy_vertex_feature_tags( TetMeshT& _mesh, TetrahedralMesh& _tetMesh)
 {
   // vertex ordering is identical --> simply copy tags if available
   if(_mesh.template vertex_property_exists<int>("AlgoHex::FeatureVertices"))
   {
-    VertexProperty<int> input_vfeature;
-    _mesh.request_vertex_property("AlgoHex::FeatureVertices", input_vfeature);
-
-    VertexProperty<int> output_vfeature;
-    _tetMesh.request_vertex_property("AlgoHex::FeatureVertices", output_vfeature);
+    auto input_vfeature = _mesh.template request_vertex_property<int>("AlgoHex::FeatureVertices");
+    auto output_vfeature = _tetMesh.request_vertex_property<int>("AlgoHex::FeatureVertices");;
     _tetMesh.set_persistent(output_vfeature,true);
 
     for (auto vh : _mesh.vertices())
     {
-      output_vfeature[vh] = input_vfeature[vh];
+      output_vfeature[VertexHandle(vh.idx())] = input_vfeature[vh];
     }
   }
 }
 
 template <typename TetMeshT>
-void copy_edge_feature_tags(const TetMeshT& _mesh, TetrahedralMesh& _tetMesh)
+void copy_edge_feature_tags( TetMeshT& _mesh, TetrahedralMesh& _tetMesh)
 {
+  // vertex ordering is identical --> identify edge correspondences via vertices (multiple edges between vertex pairs not allowed!!)
+  if(_mesh.template edge_property_exists<int>("AlgoHex::FeatureEdges"))
+  {
+    auto input_efeature = _mesh.template request_edge_property<int>("AlgoHex::FeatureEdges");
+    auto output_efeature = _tetMesh.request_edge_property<int>("AlgoHex::FeatureEdges");;
+    _tetMesh.set_persistent(output_efeature,true);
+
+    for (auto eh : _mesh.edges())
+    {
+      auto vh0 = _mesh.halfedge(_mesh.halfedge_handle(eh, 0)).to_vertex();
+      auto vh1 = _mesh.halfedge(_mesh.halfedge_handle(eh, 1)).to_vertex();
+
+      auto output_eh = _tetMesh.halfedge(vh0,vh1);
+
+      if(output_eh.is_valid())
+        output_efeature[output_eh] = input_efeature[eh];
+      else
+        std::cerr << "ERROR: copy_edge_feature_tags failed to find corresponding edge_handle" << std::endl;
+    }
+  }
 }
 
 template <typename TetMeshT>
-void copy_face_feature_tags(const TetMeshT& _mesh, TetrahedralMesh& _tetMesh)
+void copy_face_feature_tags( TetMeshT& _mesh, TetrahedralMesh& _tetMesh)
 {
+  // vertex ordering is identical --> identify face correspondences via vertices)
+  if(_mesh.template face_property_exists<int>("AlgoHex::FeatureFace"))
+  {
+    auto input_ffeature = _mesh.template request_face_property<int>("AlgoHex::FeatureFaces");
+    auto output_ffeature = _tetMesh.request_face_property<int>("AlgoHex::FeatureFaces");;
+    _tetMesh.set_persistent(output_ffeature,true);
+
+    for (auto fh : _mesh.faces())
+    {
+      auto hfh0 = _mesh.halfface_handle(fh,0);
+      auto f0 = _mesh.halfface(hfh0);
+      std::vector<VertexHandle> vhs0;
+      vhs0.push_back(_mesh.halfedge(f0.halfedges()[0]).to_vertex());
+      vhs0.push_back(_mesh.halfedge(f0.halfedges()[1]).to_vertex());
+      vhs0.push_back(_mesh.halfedge(f0.halfedges()[2]).to_vertex());
+
+      // get corresponding halfface in original mesh
+      auto output_hfh0 = _tetMesh.halfface(vhs0);
+      if(output_hfh0.is_valid())
+      {
+        auto output_fh = _tetMesh.face_handle(output_hfh0);
+        output_ffeature[output_fh] = input_ffeature[fh];
+      }
+      else
+        std::cerr << "ERROR: copy_face_feature_tags failed to find corresponding face_handle" << std::endl;
+    }
+  }
 }
 
 } // namespace HexEx

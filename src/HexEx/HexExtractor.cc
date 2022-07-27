@@ -4643,19 +4643,23 @@ Matrix4x4dd HexExtractor::transitionFrame(Parameter u, Parameter v, Parameter w)
     return frame;
 }
 
-
 void HexExtractor::transfer_feature_tags()
+{
+  transfer_vertex_feature_tags();
+  transfer_edge_feature_tags();
+  transfer_face_feature_tags();
+}
+
+void HexExtractor::transfer_vertex_feature_tags()
 {
   // transfer feature vertex tags if available
   if(inputMesh.template vertex_property_exists<int>("AlgoHex::FeatureVertices"))
   {
     std::cerr << "transfer feature vertex tags..." << std::endl;
 
-    VertexProperty<int> input_vfeature;
-    inputMesh.request_vertex_property("AlgoHex::FeatureVertices", input_vfeature);
+    auto input_vfeature = inputMesh.template request_vertex_property<int>("AlgoHex::FeatureVertices");
 
-    VertexProperty<int> output_vfeature;
-    intermediateHexMesh.request_vertex_property("AlgoHex::FeatureVertices", output_vfeature);
+    auto output_vfeature = intermediateHexMesh.request_vertex_property<int>("AlgoHex::FeatureVertices");
     intermediateHexMesh.set_persistent(output_vfeature,true);
 
     for (auto vh : intermediateHexMesh.vertices())
@@ -4671,5 +4675,12 @@ void HexExtractor::transfer_feature_tags()
   }
 }
 
+void HexExtractor::transfer_edge_feature_tags()
+{
+}
 
-} // namespace HexEx
+void HexExtractor::transfer_face_feature_tags()
+{
+}
+
+  } // namespace HexEx

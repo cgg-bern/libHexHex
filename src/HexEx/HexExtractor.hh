@@ -69,7 +69,7 @@ public:
     HexExtractor(std::string filename);
 
     template <typename MeshT>
-    HexExtractor(const MeshT& tetmesh)
+    HexExtractor(MeshT& tetmesh)
         :
           HexExtractor()
     {
@@ -84,7 +84,7 @@ public:
     }
 
     template <typename MeshT, typename ParameterT>
-    HexExtractor(const MeshT& tetmesh, PerCellVertexProperty<ParameterT>& parameters)
+    HexExtractor(MeshT& tetmesh, PerCellVertexProperty<ParameterT>& parameters)
         :
           HexExtractor(tetmesh)
     {
@@ -364,6 +364,9 @@ private:
     HalfFaceHandle extractFaceLazy(HPortHandle& normalPort, HPortHandle& tracePort);
 
     void transfer_feature_tags();
+    void transfer_vertex_feature_tags();
+    void transfer_edge_feature_tags();
+    void transfer_face_feature_tags();
 
     void deleteHexEdges();
     void deleteHexFaces();
