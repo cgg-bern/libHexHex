@@ -34,7 +34,8 @@ namespace HexEx {
 #ifdef HEXEX_VERBOSE
 #define HEXEX_DEBUG_ONLY(x) x
 #else
-#define HEXEX_DEBUG_ONLY(x)
+#define HEXEX_DEBUG_ONLY(x) x
+//#define HEXEX_DEBUG_ONLY(x)
 #endif
 
 
@@ -362,6 +363,8 @@ private:
 
     HalfFaceHandle extractFaceLazy(HPortHandle& normalPort, HPortHandle& tracePort);
 
+    void transfer_feature_tags();
+
     void deleteHexEdges();
     void deleteHexFaces();
     void deleteHexCells();
@@ -393,9 +396,13 @@ private:
     void sanitizeParametrization(bool snapBoundary = true, bool extremeTruncation = false);
     void truncatePrecision(bool extremeTruncation = false);
 
+public:
     TetrahedralMesh& getInputMesh() { return inputMesh; }
     PolyhedralMesh& getIntermediateHexMesh()    { return intermediateHexMesh;   }
 
+#ifndef HEXEX_TESTING
+private:
+#endif
     void checkThisOneProperty();
 
 

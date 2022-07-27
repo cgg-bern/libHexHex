@@ -48,7 +48,48 @@ void convertToHexExTetrahedralMesh(const TetMeshT& _mesh, TetrahedralMesh& _tetM
         auto vertices = _mesh.get_cell_vertices(*c_it);
         _tetMesh.add_cell(vertices);
     }
+
+    // copy feature tags if available
+    copy_feature_tags(_mesh, _tetMesh);
 }
 
+
+template <typename TetMeshT>
+void copy_feature_tags(const TetMeshT& _mesh, TetrahedralMesh& _tetMesh)
+{
+  copy_vertex_feature_tags(_mesh, _tetMesh);
+  copy_edge_feature_tags(_mesh, _tetMesh);
+  copy_face_feature_tags(_mesh, _tetMesh);
+}
+
+template <typename TetMeshT>
+void copy_vertex_feature_tags(const TetMeshT& _mesh, TetrahedralMesh& _tetMesh)
+{
+  // vertex ordering is identical --> simply copy tags if available
+  if(_mesh.template vertex_property_exists<int>("AlgoHex::FeatureVertices"))
+  {
+    VertexProperty<int> input_vfeature;
+    _mesh.request_vertex_property("AlgoHex::FeatureVertices", input_vfeature);
+
+    VertexProperty<int> output_vfeature;
+    _tetMesh.request_vertex_property("AlgoHex::FeatureVertices", output_vfeature);
+    _tetMesh.set_persistent(output_vfeature,true);
+
+    for (auto vh : _mesh.vertices())
+    {
+      output_vfeature[vh] = input_vfeature[vh];
+    }
+  }
+}
+
+template <typename TetMeshT>
+void copy_edge_feature_tags(const TetMeshT& _mesh, TetrahedralMesh& _tetMesh)
+{
+}
+
+template <typename TetMeshT>
+void copy_face_feature_tags(const TetMeshT& _mesh, TetrahedralMesh& _tetMesh)
+{
+}
 
 } // namespace HexEx

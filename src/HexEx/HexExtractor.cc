@@ -129,6 +129,7 @@ void HexExtractor::extract()
     extractFacesFromDarts();
     extractCellsFromDarts();
     computeLocalUVsFromSecondaryDarts();
+    transfer_feature_tags();
 }
 
 
@@ -4641,5 +4642,34 @@ Matrix4x4dd HexExtractor::transitionFrame(Parameter u, Parameter v, Parameter w)
 
     return frame;
 }
+
+
+void HexExtractor::transfer_feature_tags()
+{
+  // transfer feature vertex tags if available
+  if(inputMesh.template vertex_property_exists<int>("AlgoHex::FeatureVertices"))
+  {
+    std::cerr << "transfer feature vertex tags..." << std::endl;
+
+    VertexProperty<int> input_vfeature;
+    inputMesh.request_vertex_property("AlgoHex::FeatureVertices", input_vfeature);
+
+    VertexProperty<int> output_vfeature;
+    intermediateHexMesh.request_vertex_property("AlgoHex::FeatureVertices", output_vfeature);
+    intermediateHexMesh.set_persistent(output_vfeature,true);
+
+    for (auto vh : intermediateHexMesh.vertices())
+    {
+      int ftag = 0;
+      if (vertexTypes[vh] == VHVertex)
+      {
+        auto vh_input = VH(incidentElementId[vh]);
+        ftag = input_vfeature[vh_input];
+      }
+      output_vfeature[vh] = ftag;
+    }
+  }
+}
+
 
 } // namespace HexEx
