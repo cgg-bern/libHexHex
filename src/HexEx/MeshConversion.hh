@@ -116,7 +116,7 @@ template <typename TetMeshT>
 void copy_face_feature_tags( TetMeshT& _mesh, TetrahedralMesh& _tetMesh)
 {
   // vertex ordering is identical --> identify face correspondences via vertices)
-  if(_mesh.template face_property_exists<int>("AlgoHex::FeatureFace"))
+  if(_mesh.template face_property_exists<int>("AlgoHex::FeatureFaces"))
   {
     auto input_ffeature = _mesh.template request_face_property<int>("AlgoHex::FeatureFaces");
     auto output_ffeature = _tetMesh.request_face_property<int>("AlgoHex::FeatureFaces");;

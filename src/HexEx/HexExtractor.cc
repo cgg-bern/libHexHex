@@ -4728,37 +4728,42 @@ void HexExtractor::transfer_face_feature_tags()
       // get first halfface
       auto hfh = intermediateHexMesh.halfface_handle(fh,0);
 
+      if(halffaceDarts[hfh].empty())
+        hfh = intermediateHexMesh.opposite_halfface_handle(hfh);
+
+      // still empty?
+      if(halffaceDarts[hfh].empty())
+        std::cerr << "Warning: halffaceDarts of both halffaces of a face are empty " << fh.idx() << std::endl;
+
       if(!halffaceDarts[hfh].empty())
       {
-         std::cerr << "#darts in halfface = " << halffaceDarts[hfh].size() << std::endl;
         // get first dart
         Dart& d = *(halffaceDarts[hfh][0]);
 
         // do not check further if CellHPort (can never be aligned to tetmesh face)
-        if(d.getTracePort().type() == CellHPort)
-          break;
-
-        CH ch_tet = d.getCell();
-        auto p = d.getParameter();
-        auto nd = d.getNormalDir();
-        auto n = nd.vector();
-        auto vertices = inputMesh.get_cell_vertices(hfh);
-
-        // check all four candidate faces
-        for(unsigned int i=0; i<4; ++i)
+        if(d.getTracePort().type() != CellHPort)
         {
-          auto hfh = getOppositeHalfFace(inputMesh,ch_tet,vertices[i]);
-          auto q = getParameters(hfh);
-          // check if aligned to dart
-          if((q[0]-p).dot(n) == 0.0 && (q[1]-q[0]).dot(n) == 0.0 && (q[2]-q[0]).dot(n) == 0.0)
+          CH ch_tet = d.getCell();
+          auto p = d.getParameter();
+          auto nd = d.getNormalDir();
+          auto n = nd.vector();
+
+          // check all four candidate faces
+          for (unsigned int i = 0; i < 4; ++i)
           {
-            // copy feature tag
-            ftag = input_ffeature[inputMesh.face_handle(hfh)];
-            break;
+            auto hfh_tet = inputMesh.cell(ch_tet).halffaces()[i];
+            auto q = getParameters(hfh_tet);
+            // check if aligned to dart
+            if ((q[0] - p).dot(n) == 0.0 && (q[1] - q[0]).dot(n) == 0.0 && (q[2] - q[0]).dot(n) == 0.0)
+            {
+              // copy feature tag
+              ftag = input_ffeature[inputMesh.face_handle(hfh_tet)];
+              break;
+            }
           }
         }
       }
-
+      // store final feature tag
       output_ffeature[fh] = ftag;
     }
   }
