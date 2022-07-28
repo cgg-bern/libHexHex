@@ -4643,12 +4643,14 @@ Matrix4x4dd HexExtractor::transitionFrame(Parameter u, Parameter v, Parameter w)
     return frame;
 }
 
+
 void HexExtractor::transfer_feature_tags()
 {
   transfer_vertex_feature_tags();
   transfer_edge_feature_tags();
   transfer_face_feature_tags();
 }
+
 
 void HexExtractor::transfer_vertex_feature_tags()
 {
@@ -4675,9 +4677,10 @@ void HexExtractor::transfer_vertex_feature_tags()
   }
 }
 
+
 void HexExtractor::transfer_edge_feature_tags()
 {
-  // transfer feature vertex tags if available
+  // transfer feature edge tags if available
   if(inputMesh.template edge_property_exists<int>("AlgoHex::FeatureEdges"))
   {
     std::cerr << "transfer feature edge tags..." << std::endl;
@@ -4704,8 +4707,61 @@ void HexExtractor::transfer_edge_feature_tags()
   }
 }
 
+
 void HexExtractor::transfer_face_feature_tags()
 {
+  // transfer feature face tags if available
+  if(inputMesh.template face_property_exists<int>("AlgoHex::FeatureFaces"))
+  {
+    std::cerr << "transfer feature face tags..." << std::endl;
+
+    auto input_ffeature = inputMesh.template request_face_property<int>("AlgoHex::FeatureFaces");
+
+    auto output_ffeature = intermediateHexMesh.request_face_property<int>("AlgoHex::FeatureFaces");
+    intermediateHexMesh.set_persistent(output_ffeature,true);
+
+    for(auto fh : intermediateHexMesh.faces())
+    {
+      // default tag is 0
+      int ftag = 0;
+
+      // get first halfface
+      auto hfh = intermediateHexMesh.halfface_handle(fh,0);
+
+      if(!halffaceDarts[hfh].empty())
+      {
+         std::cerr << "#darts in halfface = " << halffaceDarts[hfh].size() << std::endl;
+        // get first dart
+        Dart& d = *(halffaceDarts[hfh][0]);
+
+        // do not check further if CellHPort (can never be aligned to tetmesh face)
+        if(d.getTracePort().type() == CellHPort)
+          break;
+
+        CH ch_tet = d.getCell();
+        auto p = d.getParameter();
+        auto nd = d.getNormalDir();
+        auto n = nd.vector();
+        auto vertices = inputMesh.get_cell_vertices(hfh);
+
+        // check all four candidate faces
+        for(unsigned int i=0; i<4; ++i)
+        {
+          auto hfh = getOppositeHalfFace(inputMesh,ch_tet,vertices[i]);
+          auto q = getParameters(hfh);
+          // check if aligned to dart
+          if((q[0]-p).dot(n) == 0.0 && (q[1]-q[0]).dot(n) == 0.0 && (q[2]-q[0]).dot(n) == 0.0)
+          {
+            // copy feature tag
+            ftag = input_ffeature[inputMesh.face_handle(hfh)];
+            break;
+          }
+        }
+      }
+
+      output_ffeature[fh] = ftag;
+    }
+  }
 }
 
-  } // namespace HexEx
+} // namespace HexEx
