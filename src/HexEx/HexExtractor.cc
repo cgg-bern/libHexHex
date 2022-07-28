@@ -1752,7 +1752,7 @@ HalfFaceHandle HexExtractor::alpha3NextFace(HalfFaceHandle prevFace, CellHandle 
 
 std::shared_ptr<Dart> HexExtractor::getDart(CellHandle ch, Parameter param, Direction traceDir, Direction refDir, Direction normalDir)
 {
-    int i = 0;
+/*    int i = 0;
 
     for (auto& p : hPortsInCell[ch])
         if (p.parameter() == param && p.dir() == traceDir)
@@ -1762,7 +1762,7 @@ std::shared_ptr<Dart> HexExtractor::getDart(CellHandle ch, Parameter param, Dire
 
     HEXEX_DEBUG_ONLY(if (i > 1)
         std::cout << "Bad :(" << std::endl;)
-
+*/
 
 
     for (auto& p : hPortsInCell[ch])
@@ -1779,6 +1779,7 @@ std::shared_ptr<Dart> HexExtractor::getDart(CellHandle ch, Parameter param, Dire
 
 std::shared_ptr<Dart> HexExtractor::getSecondaryDart(CellHandle ch, Parameter param, Direction traceDir, Direction refDir, Direction normalDir)
 {
+  /*
     int i = 0;
 
     for (auto& p : hPortsInCell[ch])
@@ -1789,7 +1790,7 @@ std::shared_ptr<Dart> HexExtractor::getSecondaryDart(CellHandle ch, Parameter pa
 
     HEXEX_DEBUG_ONLY(if (i > 1)
         std::cout << "Bad :(" << std::endl;)
-
+*/
 
 
     for (auto& p : hPortsInCell[ch])
