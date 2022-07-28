@@ -4677,6 +4677,31 @@ void HexExtractor::transfer_vertex_feature_tags()
 
 void HexExtractor::transfer_edge_feature_tags()
 {
+  // transfer feature vertex tags if available
+  if(inputMesh.template edge_property_exists<int>("AlgoHex::FeatureEdges"))
+  {
+    std::cerr << "transfer feature edge tags..." << std::endl;
+
+    auto input_efeature = inputMesh.template request_edge_property<int>("AlgoHex::FeatureEdges");
+
+    auto output_efeature = intermediateHexMesh.request_edge_property<int>("AlgoHex::FeatureEdges");
+    intermediateHexMesh.set_persistent(output_efeature,true);
+
+    for(auto eh : intermediateHexMesh.edges())
+    {
+      // get first halfedge
+      auto heh = intermediateHexMesh.halfedge_handle(eh,0);
+
+      // get incident hport
+      auto hp = incidentHPort[heh];
+
+      // is port parallel to input mesh edge?
+      int ftag = 0;
+      if(hp.type() == EdgeHPort)
+        ftag = input_efeature[hp.incidentEdgeHandle()];
+      output_efeature[eh] = ftag;
+    }
+  }
 }
 
 void HexExtractor::transfer_face_feature_tags()
