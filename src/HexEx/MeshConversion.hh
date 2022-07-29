@@ -99,7 +99,7 @@ void copy_edge_feature_tags( TetMeshT& _mesh, TetrahedralMesh& _tetMesh)
       auto vh0 = _mesh.halfedge(_mesh.halfedge_handle(eh, 0)).to_vertex();
       auto vh1 = _mesh.halfedge(_mesh.halfedge_handle(eh, 1)).to_vertex();
 
-      auto output_heh = _tetMesh.halfedge(vh0,vh1);
+      auto output_heh = _tetMesh.find_halfedge(vh0,vh1);
 
       if(output_heh.is_valid())
       {
@@ -132,7 +132,7 @@ void copy_face_feature_tags( TetMeshT& _mesh, TetrahedralMesh& _tetMesh)
       vhs0.push_back(_mesh.halfedge(f0.halfedges()[2]).to_vertex());
 
       // get corresponding halfface in original mesh
-      auto output_hfh0 = _tetMesh.halfface(vhs0);
+      auto output_hfh0 = _tetMesh.find_halfface(vhs0);
       if(output_hfh0.is_valid())
       {
         auto output_fh = _tetMesh.face_handle(output_hfh0);

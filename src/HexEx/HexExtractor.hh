@@ -118,6 +118,7 @@ public:
 
         addVerticesToHexMesh(hexMesh, optimizedMergePosition);
         addCellsToHexMesh(hexMesh);
+        transferFeatureTagsToHexmesh(hexMesh);
     }
 
     template <typename TetMeshT>
@@ -414,6 +415,9 @@ private:
     {
         auto tovec = toVec<typename HexMeshT::PointT>;
 
+        auto orig_vidx = hexMesh.template request_vertex_property<int>("intermediateHexMeshVidx");
+        hexMesh.set_persistent(orig_vidx, true);
+
         equivalenceClassVertices.clear();
         equivalenceClassVertices.resize(equivalenceClasses.size());
         for (auto i = 0u; i < equivalenceClasses.size(); ++i)
@@ -428,7 +432,10 @@ private:
                 {
                     numMerges++;
                     numMergedVertices += equivalenceClasses[i].size();
+                    orig_vidx[vh] = -1;
                 }
+                else
+                  orig_vidx[vh] = equivalenceClasses[i][0];
             }
     }
 
@@ -436,7 +443,10 @@ private:
     template <typename HexMeshT>
     void addCellsToHexMesh(HexMeshT& hexMesh)
     {
-        for (auto ch : intermediateHexMesh.cells())
+      auto orig_cidx = hexMesh.template request_cell_property<int>("intermediateHexMeshCidx");
+      hexMesh.set_persistent(orig_cidx, true);
+
+      for (auto ch : intermediateHexMesh.cells())
         {
             if (differenceBetweenInvertedAndProperDartsPerCell[ch] == -48)
             {
@@ -483,9 +493,100 @@ private:
 
                 if (vertices2.size() == 8)
                     if (std::find(vertices.begin(), vertices.end(), VertexHandle()) == vertices.end())
-                        hexMesh.add_cell(vertices,false);
+                    {
+                      auto ch_new = hexMesh.add_cell(vertices, false);
+                      orig_cidx[ch_new] = ch.idx();
+                    }
             }
         }
+    }
+
+    template <typename HexMeshT>
+    void transferFeatureTagsToHexmesh(HexMeshT& hexMesh)
+    {
+      auto orig_vidx = hexMesh.template request_vertex_property<int>("intermediateHexMeshVidx");
+      auto orig_cidx = hexMesh.template request_cell_property<int>("intermediateHexMeshCidx");
+
+      auto intermediate_vfeature = intermediateHexMesh.request_vertex_property<int>("AlgoHex::FeatureVertices");
+      auto intermediate_efeature = intermediateHexMesh.request_edge_property<int>("AlgoHex::FeatureEdges");
+      auto intermediate_ffeature = intermediateHexMesh.request_face_property<int>("AlgoHex::FeatureFaces");
+
+      auto vfeature = hexMesh.template request_vertex_property<int>("AlgoHex::FeatureVertices");
+      auto efeature = hexMesh.template request_edge_property<int>("AlgoHex::FeatureEdges");
+      auto ffeature = hexMesh.template request_face_property<int>("AlgoHex::FeatureFaces");
+      hexMesh.set_persistent(vfeature, true);
+      hexMesh.set_persistent(efeature, true);
+      hexMesh.set_persistent(ffeature, true);
+
+      // transfer vertex features
+      for (auto vh: hexMesh.vertices())
+      {
+        int vidx = orig_vidx[vh];
+        if (vidx != -1)
+          vfeature[vh] = intermediate_vfeature[VertexHandle(vidx)];
+      }
+
+      // transfer edge features
+      for (auto eh: hexMesh.edges())
+      {
+        // get incident cell
+        auto heh = hexMesh.halfedge_handle(eh, 0);
+        auto hehf_it = hexMesh.hehf_iter(heh);
+        if (hehf_it.valid()) {
+          auto hfh = *hehf_it;
+          if (hexMesh.is_boundary(hfh))
+            hfh = hexMesh.opposite_halfface_handle(hfh);
+          auto ch = hexMesh.incident_cell(hfh);
+          if (ch.is_valid()) {
+            int orig_ch_idx = orig_cidx[ch];
+            if (orig_ch_idx != -1) {
+              auto vh0 = hexMesh.from_vertex_handle(heh);
+              auto vh1 = hexMesh.to_vertex_handle(heh);
+
+              int orig_vh0_idx = orig_vidx[vh0];
+              int orig_vh1_idx = orig_vidx[vh1];
+
+              if (orig_vh0_idx != -1 && orig_vh1_idx != -1) {
+                auto orig_heh = intermediateHexMesh.find_halfedge_in_cell(VertexHandle(orig_vh0_idx), VertexHandle(orig_vh1_idx), CellHandle(orig_ch_idx));
+
+                if (orig_heh.is_valid())
+                  efeature[eh] = intermediate_efeature[intermediateHexMesh.edge_handle(orig_heh)];
+              }
+            }
+          }
+        }
+      }
+
+      // transfer face features
+      for (auto fh: hexMesh.faces())
+      {
+        // get incident cell
+        auto hfh = hexMesh.halfface_handle(fh, 0);
+
+        if (hexMesh.is_boundary(hfh))
+          hfh = hexMesh.opposite_halfface_handle(hfh);
+        auto ch = hexMesh.incident_cell(hfh);
+        if (ch.is_valid()) {
+          int orig_ch_idx = orig_cidx[ch];
+          if (orig_ch_idx != -1) {
+            auto vertices = hexMesh.get_halfface_vertices(hfh);
+
+            std::vector<VertexHandle> orig_vertices;
+            orig_vertices.reserve(vertices.size());
+            bool all_valid = true;
+            for (auto vh: vertices) {
+              orig_vertices.push_back(VertexHandle(orig_vidx[vh]));
+              if (!orig_vertices.back().is_valid())
+                all_valid = false;
+            }
+            if (all_valid) {
+              auto orig_hfh = intermediateHexMesh.find_halfface_in_cell(orig_vertices, CellHandle(orig_ch_idx));
+              if (orig_hfh.is_valid())
+                ffeature[fh] = intermediate_ffeature[intermediateHexMesh.face_handle(orig_hfh)];
+            }
+          }
+        }
+      }
     }
 
     template <typename PolyMeshT>
