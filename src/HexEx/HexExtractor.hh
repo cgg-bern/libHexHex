@@ -555,6 +555,10 @@ private:
             }
           }
         }
+
+        // properties are no longer needed
+        hexMesh.set_persistent(orig_vidx, false);
+        hexMesh.set_persistent(orig_cidx, false);
       }
 
       // transfer face features
