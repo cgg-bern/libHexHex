@@ -2537,7 +2537,7 @@ void HexExtractor::extractCellFromSecondaryDarts(HalfFaceHandle hfh)
             HEXEX_DEBUG_ONLY(std::cout << "Error: Halfface is already incident to a cell" << std::endl);
         }
 
-    intermediateHexMesh.add_cell(halffaceVector, false);
+    intermediateHexMesh.add_cell(halffaceVector, true);
 }
 
 void HexExtractor::extractCellsFromDarts()
