@@ -55,6 +55,17 @@ if (NOT TARGET OpenVolumeMesh::OpenVolumeMesh)
     FetchContent_MakeAvailable(ovm)
 endif()
 
+if (NOT TARGET Timekeeper::libTimekeeper)
+    FetchContent_Declare(timekeeper
+        GIT_REPOSITORY https://gitlab.inf.unibe.ch/cgg/code/timekeeper
+        GIT_TAG main
+        SOURCE_DIR "${EXTERNAL_DIR}/timekeeper"
+        )
+    FetchContent_Populate(timekeeper)
+    add_subdirectory("${timekeeper_SOURCE_DIR}/src")
+endif()
+
+
 
 set(SOURCE_FILES
     src/HexEx/Dart.cc
@@ -71,7 +82,7 @@ set(SOURCE_FILES
 
 add_library (HexEx ${SOURCE_FILES})
 add_library (HexEx::HexEx ALIAS HexEx)
-target_link_libraries (HexEx PUBLIC OpenVolumeMesh::OpenVolumeMesh)
+target_link_libraries (HexEx PUBLIC OpenVolumeMesh::OpenVolumeMesh Timekeeper::libTimekeeper)
 
 include(GenerateExportHeader)
 generate_export_header(HexEx
@@ -104,6 +115,7 @@ set_target_properties (HexEx PROPERTIES
     # TODO: turn this on once we have HEXEX_EXPORT macros in all required places:
     #CXX_VISIBILITY_PRESET hidden
     )
+target_compile_features(HexEx PUBLIC cxx_std_20)
 
 
 target_compile_definitions(HexEx
