@@ -2,6 +2,8 @@
 #include <fstream>
 
 #include <HexEx.hh>
+#include <HexEx/Stopwatches.hh>
+#include <libTimekeeper/StopWatchPrinting.hh>
 
 bool isInFileGood(const std::string& filename)
 {
@@ -50,5 +52,6 @@ int main(int argc, const char* argv[])
   if (isInFileGood(inFilename) && isOutFileGood(outFilename))
     HexEx::extractHexMesh(inFilename, outFilename);
 
+  std::cout << HexEx::sw::root << std::endl;
   return 0;
 }

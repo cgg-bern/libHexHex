@@ -23,8 +23,9 @@
 
 #include <string>
 
-#include "Typedefs.hh"
-#include "HexExtractor.hh"
+#include <HexEx/Typedefs.hh>
+#include <HexEx/HexExtractor.hh>
+#include <HexEx/Stopwatches.hh>
 
 namespace HexEx
 {
@@ -34,6 +35,7 @@ void extractHexMesh(const std::string& inFileName, const std::string& outFileNam
 template <typename TetMeshT, typename HexMeshT, typename ParameterT>
 void extractHexMesh(TetMeshT& tetMesh, OpenVolumeMesh::CellPropertyT<std::map<OpenVolumeMesh::VertexHandle, ParameterT> >& parameters, HexMeshT& hexMesh)
 {
+    ScopedStopWatch _{sw::root};
     HexEx::HexExtractor he(tetMesh, parameters);
     he.extract();
     he.getHexMesh(hexMesh);

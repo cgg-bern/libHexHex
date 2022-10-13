@@ -19,7 +19,8 @@
  */
 
 
-#include "FileAccessor.hh"
+#include <HexEx/FileAccessor.hh>
+#include <HexEx/Stopwatches.hh>
 
 #include <fstream>
 #include <iomanip>
@@ -27,6 +28,7 @@
 
 bool HexEx::writeToFile(std::string fileName, TetrahedralMesh& mesh, PerCellVertexProperty<Parameter>& parameters)
 {
+    ScopedStopWatch _{sw::write_file};
     std::ofstream filestream(fileName, std::ofstream::out);
     return writeToStream(filestream, mesh, parameters);
 //    return writeToStreamBinary(filestream, mesh, parameters);
@@ -35,6 +37,7 @@ bool HexEx::writeToFile(std::string fileName, TetrahedralMesh& mesh, PerCellVert
 
 bool HexEx::readFromFile(std::string fileName, TetrahedralMesh& mesh, PerCellVertexProperty<Parameter>& parameters)
 {
+    ScopedStopWatch _{sw::read_file};
     std::ifstream filestream(fileName, std::ifstream::in);
     if (!filestream.is_open())
     {

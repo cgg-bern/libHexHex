@@ -1,6 +1,8 @@
 #include <iostream>
 
 #include <HexEx.hh>
+#include <HexEx/Stopwatches.hh>
+#include <libTimekeeper/StopWatchPrinting.hh>
 
 int main()
 {
@@ -54,4 +56,6 @@ int main()
   std::cout << "The extracted hex mesh has " << hexMesh.n_cells() << " cells, "
             << hexMesh.n_faces() << " faces, " << hexMesh.n_edges() << " edges, and "
             << hexMesh.n_vertices() << " vertices." << std::endl;
+
+  std::cout << HexEx::sw::root << std::endl;
 }

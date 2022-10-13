@@ -22,19 +22,20 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-#include "HexExtractor.hh"
+#include <HexEx/HexExtractor.hh>
 
 #include <iomanip>
 #include <tuple>
 #include <queue>
 #include <algorithm>
 
-#include "Utils.hh"
-#include "ExactPredicates.hh"
+#include <HexEx/Utils.hh>
+#include <HexEx/ExactPredicates.hh>
 
-#include "DerivedExactPredicates.hh"
-#include "Direction.hh"
-#include "FileAccessor.hh"
+#include <HexEx/DerivedExactPredicates.hh>
+#include <HexEx/Direction.hh>
+#include <HexEx/FileAccessor.hh>
+#include <HexEx/Stopwatches.hh>
 
 
 using namespace OpenVolumeMesh;
@@ -117,6 +118,7 @@ HexExtractor::HexExtractor(std::string filename)
 
 void HexExtractor::extract()
 {
+    ScopedStopWatch _{sw::extract};
     sanitizeParametrization(true, false);
     extractHVertices();
     enumerateHPorts();
@@ -140,6 +142,7 @@ void HexExtractor::writeToFile(std::string filename)
 
 void HexExtractor::extractHVertices()
 {
+    ScopedStopWatch _{sw::extractHVertices};
     intermediateHexMesh.clear(false);
 
     for (auto vh : inputMesh.vertices())
