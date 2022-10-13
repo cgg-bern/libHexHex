@@ -9,4 +9,7 @@
 # gcov output files:
 *.gcda
 *.gcno
-/OpenVolumeMesh/
+
+.cache
+external
+.DS_Store
