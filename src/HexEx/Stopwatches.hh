@@ -12,6 +12,6 @@ namespace HexEx::sw {
     inline HSW root("hexex");
     inline HSW read_file("read file", root);
     inline HSW write_file("write file", root);
-    inline HSW extract("extractHVertices()", root);
+    inline HSW extract("extract", root);
     inline HSW extractHVertices("extractHVertices()", extract);
 }
