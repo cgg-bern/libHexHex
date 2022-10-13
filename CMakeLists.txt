@@ -18,8 +18,8 @@
 # along with HexEx.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
-cmake_policy(VERSION 3.12.0)
+cmake_minimum_required(VERSION 3.18 FATAL_ERROR)
+cmake_policy(VERSION 3.18.0)
 
 project (HexEx
     VERSION 1.0.0
@@ -42,18 +42,17 @@ if(HEXEX_STANDALONE_BUILD)
     set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/Build/lib")
 endif()
 
-#list (APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
-
-if(NOT TARGET OpenVolumeMesh::OpenVolumeMesh AND EXISTS "${CMAKE_CURRENT_LIST_DIR}/OpenVolumeMesh")
-  add_subdirectory(OpenVolumeMesh)
-  message("Building with local OpenVolumeMesh")
-else()
-  message("Not building with local OpenVolumeMesh")
-endif()
+include(FetchContent)
+set(EXTERNAL_DIR "${CMAKE_CURRENT_SOURCE_DIR}/external")
 
 if (NOT TARGET OpenVolumeMesh::OpenVolumeMesh)
- find_package (OpenVolumeMesh REQUIRED)
+    FetchContent_Declare(ovm
+        GIT_REPOSITORY https://www.graphics.rwth-aachen.de:9000/OpenVolumeMesh/OpenVolumeMesh
+        GIT_TAG v3.2
+        SOURCE_DIR "${EXTERNAL_DIR}/OpenVolumeMesh"
+        )
+    FetchContent_MakeAvailable(ovm)
 endif()
 
 
