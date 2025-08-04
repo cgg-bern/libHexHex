@@ -1,31 +1,18 @@
 /*
- * Copyright 2019 Computer Graphics Group, RWTH Aachen University
- * Author: Max Lyon <lyon@cs.rwth-aachen.de>
+ * Copyright 2025 Computer Graphics Group, University of Bern - Tobias Kohler <tobias.kohler@unibe.ch>
+ * Copyright 2016 Computer Graphics Group, RWTH Aachen University - Max Lyon <lyon@cs.rwth-aachen.de>
  *
- * This file is part of HexEx.
- *
- * HexEx is free software: you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free
- * Software Foundation, either version 3 of the License, or (at your
- * option) any later version.
- *
- * HexEx is distributed in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
- * for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with HexEx.  If not, see <http://www.gnu.org/licenses/>.
+ * This file is part of HexHex.
  */
 
 #include <chrono>
 #include <gtest/gtest.h>
 #include "common.hh"
-#include "Utils.hh"
-#include <HexExtractor.hh>
-#include <GridIsomorphism.hh>
+#include <HexHex/Utils/Utils.hh>
+#include <HexHex/HexExtractor.hh>
+#include <HexHex/Commons/Transition.hh>
 
-using namespace HexEx;
+using namespace HexHex;
 
 TEST(GridIsomorphismTest, matrixTest) {
 
@@ -49,10 +36,10 @@ TEST(GridIsomorphismTest, coversionTest) {
 
     for (auto i = 0; i < 24; i++)
     {
-        auto rr = HexEx::RestrictedRotation(i);
+        auto rr = HexHex::RestrictedRotation(i);
         auto m = rr.toMatrix();
 
-        auto rr2 = HexEx::RestrictedRotation(m);
+        auto rr2 = HexHex::RestrictedRotation(m);
 
         EXPECT_EQ(rr, rr2);
     }
@@ -63,12 +50,12 @@ TEST(GridIsomorphismTest, transformationTest) {
 
     for (auto i = 0; i < 24; i++)
     {
-        auto rr = HexEx::RestrictedRotation(i);
+        auto rr = HexHex::RestrictedRotation(i);
         auto m = rr.toMatrix();
 
         for (auto j = 0; j < 100; ++j)
         {
-            auto randomVec = HexEx::getRandomVector(10);
+            auto randomVec = getRandomVector(10);
             EXPECT_EQ(m.transform_point(randomVec), rr.transform(randomVec)) << i;
         }
     }
@@ -79,7 +66,7 @@ TEST(GridIsomorphismTest, inversionTest) {
 
     for (char i = 0; i < 24; i++)
     {
-        auto rr = HexEx::RestrictedRotation(i);
+        auto rr = HexHex::RestrictedRotation(i);
         auto m = rr.toMatrix();
         m.invert();
 
@@ -98,8 +85,8 @@ TEST(GridIsomorphismTest, multiplicationTest) {
     for (auto i = 0u; i < 24; i++)
         for (auto j = 0u; j < 24; j++)
         {
-            auto rr1 = HexEx::RestrictedRotation(i);
-            auto rr2 = HexEx::RestrictedRotation(j);
+            auto rr1 = HexHex::RestrictedRotation(i);
+            auto rr2 = HexHex::RestrictedRotation(j);
 
             auto res = rr1 * rr2;
 
@@ -116,10 +103,10 @@ TEST(GridIsomorphismTest, isomorphismInversionTest) {
         for (auto k = 0; k < 3; ++k)
             for (auto l = 0; l < 3; ++l)
             {
-                auto t = HexEx::GridIsomorphism::Translation(j,k,l);
+                auto t = HexHex::Transition::Translation(j,k,l);
                 for (auto i = 0; i < 24; i++)
                 {
-                    auto gi = HexEx::GridIsomorphism(i, t);
+                    auto gi = HexHex::Transition(i, t);
                     auto m = gi.toMatrix();
                     m.invert();
 
@@ -141,9 +128,9 @@ TEST(GridIsomorphismTest, isomorphismInversionTest) {
 //#ifdef DEBUG
 //    N /= 100;
 //#endif
-//    auto gis = std::vector<HexEx::GridIsomorphism>();
+//    auto gis = std::vector<HexHex::GridIsomorphism>();
 //    for (auto i = 0; i < 24; ++i)
-//        gis.push_back(HexEx::GridIsomorphism(i));
+//        gis.push_back(HexHex::GridIsomorphism(i));
 
 //    auto matrices = std::vector<Matrix4x4dd>();
 //    for (auto i = 0; i < 24; ++i)
@@ -151,7 +138,7 @@ TEST(GridIsomorphismTest, isomorphismInversionTest) {
 
 //    auto startGI = steady_clock::now();
 
-//    auto res = HexEx::GridIsomorphism(0);
+//    auto res = HexHex::GridIsomorphism(0);
 //    for (auto n = 0; n < N; ++n)
 //    {
 //        for (auto i = 0u; i < 24; i++)
@@ -202,9 +189,9 @@ TEST(GridIsomorphismTest, isomorphismInversionTest) {
 //#ifdef DEBUG
 //    N /= 100;
 //#endif
-//    auto gis = std::vector<HexEx::GridIsomorphism>();
+//    auto gis = std::vector<HexHex::GridIsomorphism>();
 //    for (auto i = 0; i < 24; ++i)
-//        gis.push_back(HexEx::GridIsomorphism(i));
+//        gis.push_back(HexHex::GridIsomorphism(i));
 
 //    auto matrices = std::vector<Matrix4x4dd>();
 //    for (size_t i = 0; i < 24; ++i)
@@ -249,9 +236,9 @@ TEST(GridIsomorphismTest, isomorphismInversionTest) {
 //#ifdef DEBUG
 //    N /= 100;
 //#endif
-//    auto gis = std::vector<HexEx::GridIsomorphism>();
+//    auto gis = std::vector<HexHex::GridIsomorphism>();
 //    for (auto i = 0; i < 24; ++i)
-//        gis.push_back(HexEx::GridIsomorphism(i));
+//        gis.push_back(HexHex::GridIsomorphism(i));
 
 //    auto matrices = std::vector<Matrix4x4dd>();
 //    for (auto i = 0; i < 24; ++i)

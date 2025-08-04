@@ -1,38 +1,32 @@
 #pragma once
 
-#include <Utils.hh>
-#include <Typedefs.hh>
+#include <HexHex/Commons/CellIGM.hh>
+#include <HexHex/Utils/Utils.hh>
+#include <HexHex/Utils/Typedefs.hh>
+#include <HexHex/Commons/Matrix4x4T.hh>
 
-#include <random>
+bool check_that_all_halffaces_referenced_by_cells_exists(HexHex::TetrahedralMesh& mesh);
 
-#define HEXEX_TESTING
+HexHex::Vec3d getRandomVector(int absmax = 10);
 
-bool check_that_all_halffaces_referenced_by_cells_exists(HexEx::TetrahedralMesh& mesh);
+HexHex::Vec3d getRandomVectorDouble();
 
-HexEx::Vec3d getRandomVector();
+HexHex::Matrix4x4d getRandomMatrix();
 
-
-HexEx::Vec3d getRandomVectorDouble();
-
-
-HexEx::Matrix4x4d getRandomMatrix();
-
-
-template <typename MeshT>
-void createCube(MeshT& mesh, double parametrizationSideLength)
+inline void createCube(HexHex::TetrahedralMesh& mesh, double parametrizationSideLength)
 {
     using VertexHandle = OpenVolumeMesh::VertexHandle;
     using CellHandle   = OpenVolumeMesh::CellHandle;
 
     std::vector<VertexHandle> vhs;
-    vhs.push_back(mesh.add_vertex(typename MeshT::PointT( 0.0, 0.0, 0.0)));
-    vhs.push_back(mesh.add_vertex(typename MeshT::PointT( 1.0, 0.0, 0.0)));
-    vhs.push_back(mesh.add_vertex(typename MeshT::PointT( 1.0, 0.0, 1.0)));
-    vhs.push_back(mesh.add_vertex(typename MeshT::PointT( 0.0, 0.0, 1.0)));
-    vhs.push_back(mesh.add_vertex(typename MeshT::PointT( 0.0, 1.0, 0.0)));
-    vhs.push_back(mesh.add_vertex(typename MeshT::PointT( 1.0, 1.0, 0.0)));
-    vhs.push_back(mesh.add_vertex(typename MeshT::PointT( 1.0, 1.0, 1.0)));
-    vhs.push_back(mesh.add_vertex(typename MeshT::PointT( 0.0, 1.0, 1.0)));
+    vhs.push_back(mesh.add_vertex(HexHex::Vec3d( 0.0, 0.0, 0.0)));
+    vhs.push_back(mesh.add_vertex(HexHex::Vec3d( 1.0, 0.0, 0.0)));
+    vhs.push_back(mesh.add_vertex(HexHex::Vec3d( 1.0, 0.0, 1.0)));
+    vhs.push_back(mesh.add_vertex(HexHex::Vec3d( 0.0, 0.0, 1.0)));
+    vhs.push_back(mesh.add_vertex(HexHex::Vec3d( 0.0, 1.0, 0.0)));
+    vhs.push_back(mesh.add_vertex(HexHex::Vec3d( 1.0, 1.0, 0.0)));
+    vhs.push_back(mesh.add_vertex(HexHex::Vec3d( 1.0, 1.0, 1.0)));
+    vhs.push_back(mesh.add_vertex(HexHex::Vec3d( 0.0, 1.0, 1.0)));
 
     std::vector<CellHandle> chs;
     std::vector<VertexHandle> c;
@@ -72,10 +66,10 @@ void createCube(MeshT& mesh, double parametrizationSideLength)
     c.push_back(vhs[1]);
     chs.push_back(mesh.add_cell(c));
 
-    OpenVolumeMesh::CellPropertyT<std::map<VertexHandle, HexEx::Vec3d>> parametrization = mesh.template request_cell_property<std::map<OpenVolumeMesh::VertexHandle, HexEx::Vec3d>>("Parametrization");
+    HexHex::IGM parametrization = mesh.request_cell_property<HexHex::CellIGM>("Parametrization");
     mesh.set_persistent(parametrization);
 
-    HexEx::Vec3d offset = HexEx::Vec3d(0.0,0.0,0.0);
+    HexHex::Vec3d offset = HexHex::Vec3d(0.0,0.0,0.0);
     double scale = parametrizationSideLength;
 
     for (auto ch : chs)
@@ -84,28 +78,27 @@ void createCube(MeshT& mesh, double parametrizationSideLength)
         for (auto vh : vertices)
         {
             auto pos = mesh.vertex(vh);
-            HexEx::Vec3d pos2 = HexEx::Vec3d(pos[0], pos[1], pos[2]);
+            HexHex::Vec3d pos2 = HexHex::Vec3d(pos[0], pos[1], pos[2]);
             parametrization[ch][vh] = pos2*scale+offset;
         }
     }
 }
 
-template <typename MeshT>
-void createCube(MeshT& mesh)
+
+inline void createCube(HexHex::TetrahedralMesh& mesh)
 {
     using VertexHandle = OpenVolumeMesh::VertexHandle;
     using HalfFaceHandle = OpenVolumeMesh::HalfFaceHandle;
-    using CellHandle   = OpenVolumeMesh::CellHandle;
 
     std::vector<VertexHandle> vhs;
-    vhs.push_back(mesh.add_vertex(typename MeshT::PointT( 0.0, 0.0, 0.0)));
-    vhs.push_back(mesh.add_vertex(typename MeshT::PointT( 1.0, 0.0, 0.0)));
-    vhs.push_back(mesh.add_vertex(typename MeshT::PointT( 1.0, 0.0, 1.0)));
-    vhs.push_back(mesh.add_vertex(typename MeshT::PointT( 0.0, 0.0, 1.0)));
-    vhs.push_back(mesh.add_vertex(typename MeshT::PointT( 0.0, 1.0, 0.0)));
-    vhs.push_back(mesh.add_vertex(typename MeshT::PointT( 1.0, 1.0, 0.0)));
-    vhs.push_back(mesh.add_vertex(typename MeshT::PointT( 1.0, 1.0, 1.0)));
-    vhs.push_back(mesh.add_vertex(typename MeshT::PointT( 0.0, 1.0, 1.0)));
+    vhs.push_back(mesh.add_vertex(HexHex::Vec3d( 0.0, 0.0, 0.0)));
+    vhs.push_back(mesh.add_vertex(HexHex::Vec3d( 1.0, 0.0, 0.0)));
+    vhs.push_back(mesh.add_vertex(HexHex::Vec3d( 1.0, 0.0, 1.0)));
+    vhs.push_back(mesh.add_vertex(HexHex::Vec3d( 0.0, 0.0, 1.0)));
+    vhs.push_back(mesh.add_vertex(HexHex::Vec3d( 0.0, 1.0, 0.0)));
+    vhs.push_back(mesh.add_vertex(HexHex::Vec3d( 1.0, 1.0, 0.0)));
+    vhs.push_back(mesh.add_vertex(HexHex::Vec3d( 1.0, 1.0, 1.0)));
+    vhs.push_back(mesh.add_vertex(HexHex::Vec3d( 0.0, 1.0, 1.0)));
 
     std::vector<HalfFaceHandle> hfhs;
 
@@ -121,21 +114,20 @@ void createCube(MeshT& mesh)
 }
 
 
-template <typename MeshT>
-void createCubeWithTransition(MeshT& mesh, double parametrizationSideLength)
+inline void createCubeWithTransition(HexHex::TetrahedralMesh& mesh, double parametrizationSideLength)
 {
     using VertexHandle = OpenVolumeMesh::VertexHandle;
     using CellHandle   = OpenVolumeMesh::CellHandle;
 
     std::vector<VertexHandle> vhs;
-    vhs.push_back(mesh.add_vertex(typename MeshT::PointT( 0.0, 0.0, 0.0)));
-    vhs.push_back(mesh.add_vertex(typename MeshT::PointT( 1.0, 0.0, 0.0)));
-    vhs.push_back(mesh.add_vertex(typename MeshT::PointT( 1.0, 0.0, 1.0)));
-    vhs.push_back(mesh.add_vertex(typename MeshT::PointT( 0.0, 0.0, 1.0)));
-    vhs.push_back(mesh.add_vertex(typename MeshT::PointT( 0.0, 1.0, 0.0)));
-    vhs.push_back(mesh.add_vertex(typename MeshT::PointT( 1.0, 1.0, 0.0)));
-    vhs.push_back(mesh.add_vertex(typename MeshT::PointT( 1.0, 1.0, 1.0)));
-    vhs.push_back(mesh.add_vertex(typename MeshT::PointT( 0.0, 1.0, 1.0)));
+    vhs.push_back(mesh.add_vertex(HexHex::Vec3d( 0.0, 0.0, 0.0)));
+    vhs.push_back(mesh.add_vertex(HexHex::Vec3d( 1.0, 0.0, 0.0)));
+    vhs.push_back(mesh.add_vertex(HexHex::Vec3d( 1.0, 0.0, 1.0)));
+    vhs.push_back(mesh.add_vertex(HexHex::Vec3d( 0.0, 0.0, 1.0)));
+    vhs.push_back(mesh.add_vertex(HexHex::Vec3d( 0.0, 1.0, 0.0)));
+    vhs.push_back(mesh.add_vertex(HexHex::Vec3d( 1.0, 1.0, 0.0)));
+    vhs.push_back(mesh.add_vertex(HexHex::Vec3d( 1.0, 1.0, 1.0)));
+    vhs.push_back(mesh.add_vertex(HexHex::Vec3d( 0.0, 1.0, 1.0)));
 
     std::vector<CellHandle> chs;
     std::vector<VertexHandle> c;
@@ -175,14 +167,14 @@ void createCubeWithTransition(MeshT& mesh, double parametrizationSideLength)
     c.push_back(vhs[1]);
     chs.push_back(mesh.add_cell(c));
 
-    OpenVolumeMesh::CellPropertyT<std::map<VertexHandle, HexEx::Vec3d>> parametrization = mesh.template request_cell_property<std::map<VertexHandle, HexEx::Vec3d>>("Parametrization");
+    HexHex::IGM parametrization = mesh.request_cell_property<HexHex::CellIGM>("Parametrization");
     mesh.set_persistent(parametrization);
 
-    HexEx::Vec3d offset = HexEx::Vec3d(2.0,0.0,0.0);
+    HexHex::Vec3d offset = HexHex::Vec3d(2.0,0.0,0.0);
     double scale = parametrizationSideLength;
 
     double heightThreshold = 0.5;
-    HexEx::Matrix4x4d transform = HexEx::Matrix4x4d();
+    HexHex::Matrix4x4d transform = HexHex::Matrix4x4d();
     transform(0,0) = 0; transform(0,1) = 1; transform(0,2) = 0; transform(0,3) = 3;
     transform(1,0) = 0; transform(1,1) = 0; transform(1,2) = 1; transform(1,3) = 3;
     transform(2,0) = 1; transform(2,1) = 0; transform(2,2) = 0; transform(2,3) = 3;
@@ -197,7 +189,7 @@ void createCubeWithTransition(MeshT& mesh, double parametrizationSideLength)
             for (auto vh : vertices)
             {
                 auto pos = mesh.vertex(vh);
-                HexEx::Vec3d pos2 = HexEx::Vec3d(pos[0], pos[1], pos[2]);
+                HexHex::Vec3d pos2 = HexHex::Vec3d(pos[0], pos[1], pos[2]);
                 parametrization[ch][vh] = transform.transform_point(pos2*scale+offset);
             }
         }
@@ -207,7 +199,7 @@ void createCubeWithTransition(MeshT& mesh, double parametrizationSideLength)
             for (auto vh : vertices)
             {
                 auto pos = mesh.vertex(vh);
-                HexEx::Vec3d pos2 = HexEx::Vec3d(pos[0], pos[1], pos[2]);
+                HexHex::Vec3d pos2 = HexHex::Vec3d(pos[0], pos[1], pos[2]);
                 parametrization[ch][vh] = pos2*scale+offset;
             }
         }
@@ -215,8 +207,11 @@ void createCubeWithTransition(MeshT& mesh, double parametrizationSideLength)
 
 }
 
-template <typename MeshT>
-OpenVolumeMesh::CellHandle addCube(OpenVolumeMesh::VertexHandle vh0, OpenVolumeMesh::VertexHandle vh1, OpenVolumeMesh::VertexHandle vh2, OpenVolumeMesh::VertexHandle vh3, OpenVolumeMesh::VertexHandle vh4, OpenVolumeMesh::VertexHandle vh5, OpenVolumeMesh::VertexHandle vh6, OpenVolumeMesh::VertexHandle vh7, MeshT& mesh, bool other)
+inline OpenVolumeMesh::CellHandle addCube(OpenVolumeMesh::VertexHandle vh0, OpenVolumeMesh::VertexHandle vh1,
+                                   OpenVolumeMesh::VertexHandle vh2, OpenVolumeMesh::VertexHandle vh3,
+                                   OpenVolumeMesh::VertexHandle vh4, OpenVolumeMesh::VertexHandle vh5,
+                                   OpenVolumeMesh::VertexHandle vh6, OpenVolumeMesh::VertexHandle vh7,
+                                   HexHex::TetrahedralMesh& mesh, bool other)
 {
     using CellHandle   = OpenVolumeMesh::CellHandle;
     if (!other)
@@ -240,53 +235,51 @@ OpenVolumeMesh::CellHandle addCube(OpenVolumeMesh::VertexHandle vh0, OpenVolumeM
 }
 
 
-template <typename MeshT>
-void createMasterVertexMesh(MeshT& mesh, bool centerOffset = false)
+inline void createMasterVertexMesh(HexHex::TetrahedralMesh& mesh, bool centerOffset = false)
 {
     using VertexHandle = OpenVolumeMesh::VertexHandle;
-    using CellHandle   = OpenVolumeMesh::CellHandle;
 
-    VertexHandle luh = mesh.add_vertex(typename MeshT::PointT(-1.0,-1.5,-1.0));
-    VertexHandle ruh = mesh.add_vertex(typename MeshT::PointT( 1.0,-1.0,-1.5));
-    VertexHandle loh = mesh.add_vertex(typename MeshT::PointT(-1.0, 1.5,-1.0));
-    VertexHandle roh = mesh.add_vertex(typename MeshT::PointT( 1.0, 1.0,-1.5));
-    VertexHandle luv = mesh.add_vertex(typename MeshT::PointT(-1.0,-1.5, 1.0));
-    VertexHandle ruv = mesh.add_vertex(typename MeshT::PointT( 1.0,-1.0, 1.5));
-    VertexHandle lov = mesh.add_vertex(typename MeshT::PointT(-1.0, 1.5, 1.0));
-    VertexHandle rov = mesh.add_vertex(typename MeshT::PointT( 1.0, 1.0, 1.5));
+    VertexHandle luh = mesh.add_vertex(HexHex::Vec3d(-1.0,-1.5,-1.0));
+    VertexHandle ruh = mesh.add_vertex(HexHex::Vec3d( 1.0,-1.0,-1.5));
+    VertexHandle loh = mesh.add_vertex(HexHex::Vec3d(-1.0, 1.5,-1.0));
+    VertexHandle roh = mesh.add_vertex(HexHex::Vec3d( 1.0, 1.0,-1.5));
+    VertexHandle luv = mesh.add_vertex(HexHex::Vec3d(-1.0,-1.5, 1.0));
+    VertexHandle ruv = mesh.add_vertex(HexHex::Vec3d( 1.0,-1.0, 1.5));
+    VertexHandle lov = mesh.add_vertex(HexHex::Vec3d(-1.0, 1.5, 1.0));
+    VertexHandle rov = mesh.add_vertex(HexHex::Vec3d( 1.0, 1.0, 1.5));
 
-    VertexHandle lmhu = mesh.add_vertex(typename MeshT::PointT(-1.0,-0.5,-1.0));
-    VertexHandle rmh  = mesh.add_vertex(typename MeshT::PointT( 1.0, 0.0,-1.5));
-    VertexHandle lmvu = mesh.add_vertex(typename MeshT::PointT(-1.0,-0.5, 1.0));
-    VertexHandle rmv  = mesh.add_vertex(typename MeshT::PointT( 1.0, 0.0, 1.5));
+    VertexHandle lmhu = mesh.add_vertex(HexHex::Vec3d(-1.0,-0.5,-1.0));
+    VertexHandle rmh  = mesh.add_vertex(HexHex::Vec3d( 1.0, 0.0,-1.5));
+    VertexHandle lmvu = mesh.add_vertex(HexHex::Vec3d(-1.0,-0.5, 1.0));
+    VertexHandle rmv  = mesh.add_vertex(HexHex::Vec3d( 1.0, 0.0, 1.5));
 
-    VertexHandle lmho = mesh.add_vertex(typename MeshT::PointT(-1.0, 0.5,-1.0));
-    VertexHandle lmvo = mesh.add_vertex(typename MeshT::PointT(-1.0, 0.5, 1.0));
+    VertexHandle lmho = mesh.add_vertex(HexHex::Vec3d(-1.0, 0.5,-1.0));
+    VertexHandle lmvo = mesh.add_vertex(HexHex::Vec3d(-1.0, 0.5, 1.0));
 
-    VertexHandle muh = mesh.add_vertex(typename MeshT::PointT( 0.0,-1.0,-1.0));
-    VertexHandle moh = mesh.add_vertex(typename MeshT::PointT( 0.0, 1.0,-1.0));
-    VertexHandle muv = mesh.add_vertex(typename MeshT::PointT( 0.0,-1.0, 1.0));
-    VertexHandle mov = mesh.add_vertex(typename MeshT::PointT( 0.0, 1.0, 1.0));
+    VertexHandle muh = mesh.add_vertex(HexHex::Vec3d( 0.0,-1.0,-1.0));
+    VertexHandle moh = mesh.add_vertex(HexHex::Vec3d( 0.0, 1.0,-1.0));
+    VertexHandle muv = mesh.add_vertex(HexHex::Vec3d( 0.0,-1.0, 1.0));
+    VertexHandle mov = mesh.add_vertex(HexHex::Vec3d( 0.0, 1.0, 1.0));
 
-    VertexHandle lum  = mesh.add_vertex(typename MeshT::PointT(-1.0,-1.5, 0.0));
-    VertexHandle rumh = mesh.add_vertex(typename MeshT::PointT( 1.0,-1.0,-0.5));
-    VertexHandle rumv = mesh.add_vertex(typename MeshT::PointT( 1.0,-1.0, 0.5));
-    VertexHandle lom  = mesh.add_vertex(typename MeshT::PointT(-1.0, 1.5, 0.0));
-    VertexHandle romh = mesh.add_vertex(typename MeshT::PointT( 1.0, 1.0,-0.5));
-    VertexHandle romv = mesh.add_vertex(typename MeshT::PointT( 1.0, 1.0, 0.5));
+    VertexHandle lum  = mesh.add_vertex(HexHex::Vec3d(-1.0,-1.5, 0.0));
+    VertexHandle rumh = mesh.add_vertex(HexHex::Vec3d( 1.0,-1.0,-0.5));
+    VertexHandle rumv = mesh.add_vertex(HexHex::Vec3d( 1.0,-1.0, 0.5));
+    VertexHandle lom  = mesh.add_vertex(HexHex::Vec3d(-1.0, 1.5, 0.0));
+    VertexHandle romh = mesh.add_vertex(HexHex::Vec3d( 1.0, 1.0,-0.5));
+    VertexHandle romv = mesh.add_vertex(HexHex::Vec3d( 1.0, 1.0, 0.5));
 
-    VertexHandle mmh = mesh.add_vertex(typename MeshT::PointT( 0.0, 0.0,-1.0));
-    VertexHandle mmv = mesh.add_vertex(typename MeshT::PointT( 0.0, 0.0, 1.0));
+    VertexHandle mmh = mesh.add_vertex(HexHex::Vec3d( 0.0, 0.0,-1.0));
+    VertexHandle mmv = mesh.add_vertex(HexHex::Vec3d( 0.0, 0.0, 1.0));
 
-    VertexHandle lmmu = mesh.add_vertex(typename MeshT::PointT(-1.0,-0.5, 0.0));
-    VertexHandle lmmo = mesh.add_vertex(typename MeshT::PointT(-1.0, 0.5, 0.0));
-    VertexHandle rmmh = mesh.add_vertex(typename MeshT::PointT( 1.0, 0.0,-0.5));
-    VertexHandle rmmv = mesh.add_vertex(typename MeshT::PointT( 1.0, 0.0, 0.5));
+    VertexHandle lmmu = mesh.add_vertex(HexHex::Vec3d(-1.0,-0.5, 0.0));
+    VertexHandle lmmo = mesh.add_vertex(HexHex::Vec3d(-1.0, 0.5, 0.0));
+    VertexHandle rmmh = mesh.add_vertex(HexHex::Vec3d( 1.0, 0.0,-0.5));
+    VertexHandle rmmv = mesh.add_vertex(HexHex::Vec3d( 1.0, 0.0, 0.5));
 
-    VertexHandle mum = mesh.add_vertex(typename MeshT::PointT( 0.0,-1.0, 0.0));
-    VertexHandle mom = mesh.add_vertex(typename MeshT::PointT( 0.0, 1.0, 0.0));
+    VertexHandle mum = mesh.add_vertex(HexHex::Vec3d( 0.0,-1.0, 0.0));
+    VertexHandle mom = mesh.add_vertex(HexHex::Vec3d( 0.0, 1.0, 0.0));
 
-    VertexHandle mmm = mesh.add_vertex(typename MeshT::PointT( 0.0, 0.0, 0.0));
+    VertexHandle mmm = mesh.add_vertex(HexHex::Vec3d( 0.0, 0.0, 0.0));
 
     addCube(luv, muv, mum, lum, lmvu, mmv, mmm, lmmu, mesh, false);
     addCube(muv, ruv, rumv, mum, mmv, rmv, rmmv, mmm, mesh, true);
@@ -297,30 +290,30 @@ void createMasterVertexMesh(MeshT& mesh, bool centerOffset = false)
     addCube(lmmo, mmm, mmh, lmho, lom, mom, moh, loh, mesh, false);
     addCube(mmm, rmmh, rmh, mmh, mom, romh, roh, moh, mesh, true);
 
-    OpenVolumeMesh::CellPropertyT<std::map<VertexHandle, HexEx::Vec3d>> parametrization = mesh.template request_cell_property<std::map<VertexHandle, HexEx::Vec3d>>("Parametrization");
+    HexHex::IGM parametrization = mesh.request_cell_property<HexHex::CellIGM>("Parametrization");
     mesh.set_persistent(parametrization);
 
-    HexEx::Vec3d offset = HexEx::Vec3d(0.0,0.0,0.0);
+    HexHex::Vec3d offset = HexHex::Vec3d(0.0,0.0,0.0);
 
-    HexEx::Matrix4x4d transformleftshiftup = HexEx::Matrix4x4d();
+    HexHex::Matrix4x4d transformleftshiftup = HexHex::Matrix4x4d();
     transformleftshiftup(0,0) = 1; transformleftshiftup(0,1) = 0; transformleftshiftup(0,2) = 0; transformleftshiftup(0,3) = 0;
     transformleftshiftup(1,0) =-0.5; transformleftshiftup(1,1) = 1; transformleftshiftup(1,2) = 0; transformleftshiftup(1,3) = 0;
     transformleftshiftup(2,0) = 0; transformleftshiftup(2,1) = 0; transformleftshiftup(2,2) = 1; transformleftshiftup(2,3) = 0;
     transformleftshiftup(3,0) = 0; transformleftshiftup(3,1) = 0; transformleftshiftup(3,2) = 0; transformleftshiftup(3,3) = 1;
 
-    HexEx::Matrix4x4d transformleftshiftdown = HexEx::Matrix4x4d();
+    HexHex::Matrix4x4d transformleftshiftdown = HexHex::Matrix4x4d();
     transformleftshiftdown(0,0) = 1; transformleftshiftdown(0,1) = 0; transformleftshiftdown(0,2) = 0; transformleftshiftdown(0,3) = 0;
     transformleftshiftdown(1,0) =0.5; transformleftshiftdown(1,1) = 1; transformleftshiftdown(1,2) = 0; transformleftshiftdown(1,3) = 0;
     transformleftshiftdown(2,0) = 0; transformleftshiftdown(2,1) = 0; transformleftshiftdown(2,2) = 1; transformleftshiftdown(2,3) = 0;
     transformleftshiftdown(3,0) = 0; transformleftshiftdown(3,1) = 0; transformleftshiftdown(3,2) = 0; transformleftshiftdown(3,3) = 1;
 
-    HexEx::Matrix4x4d transformrightshiftback = HexEx::Matrix4x4d();
+    HexHex::Matrix4x4d transformrightshiftback = HexHex::Matrix4x4d();
     transformrightshiftback(0,0) = 1; transformrightshiftback(0,1) = 0; transformrightshiftback(0,2) = 0; transformrightshiftback(0,3) = 0;
     transformrightshiftback(1,0) = 0; transformrightshiftback(1,1) = 1; transformrightshiftback(1,2) = 0; transformrightshiftback(1,3) = 0;
     transformrightshiftback(2,0) =-0.5; transformrightshiftback(2,1) = 0; transformrightshiftback(2,2) = 1; transformrightshiftback(2,3) = 0;
     transformrightshiftback(3,0) = 0; transformrightshiftback(3,1) = 0; transformrightshiftback(3,2) = 0; transformrightshiftback(3,3) = 1;
 
-    HexEx::Matrix4x4d transformrightshiftfront = HexEx::Matrix4x4d();
+    HexHex::Matrix4x4d transformrightshiftfront = HexHex::Matrix4x4d();
     transformrightshiftfront(0,0) = 1; transformrightshiftfront(0,1) = 0; transformrightshiftfront(0,2) = 0; transformrightshiftfront(0,3) = 0;
     transformrightshiftfront(1,0) = 0; transformrightshiftfront(1,1) = 1; transformrightshiftfront(1,2) = 0; transformrightshiftfront(1,3) = 0;
     transformrightshiftfront(2,0) = 0.5; transformrightshiftfront(2,1) = 0; transformrightshiftfront(2,2) = 1; transformrightshiftfront(2,3) = 0;
@@ -329,7 +322,7 @@ void createMasterVertexMesh(MeshT& mesh, bool centerOffset = false)
     for (auto c_it = mesh.cells_begin(); c_it != mesh.cells_end(); ++c_it)
     {
         auto ch = *c_it;
-        HexEx::Matrix4x4d transform;
+        HexHex::Matrix4x4d transform;
         if (ch.idx() < 5)
             transform = transformleftshiftup;
         if ((ch.idx() > 9) && (ch.idx() < 15))
@@ -351,7 +344,7 @@ void createMasterVertexMesh(MeshT& mesh, bool centerOffset = false)
         for (auto vh : vertices)
         {
             auto pos = mesh.vertex(vh);
-            HexEx::Vec3d pos2 = HexEx::Vec3d(pos[0], pos[1], pos[2]);
+            HexHex::Vec3d pos2 = HexHex::Vec3d(pos[0], pos[1], pos[2]);
             parametrization[ch][vh] = transform.transform_point(pos2)+offset;
             if (centerOffset && (vh == mmm))
                 parametrization[ch][vh] += 0.01*getRandomVector();
@@ -362,21 +355,19 @@ void createMasterVertexMesh(MeshT& mesh, bool centerOffset = false)
 
 }
 
-template <typename MeshT>
-void createPrism(MeshT& mesh, bool centeroffset = false, bool smaller = false)
+inline void createPrism(HexHex::TetrahedralMesh& mesh, bool centeroffset = false, bool smaller = false)
 {
     using VertexHandle = OpenVolumeMesh::VertexHandle;
-    using CellHandle   = OpenVolumeMesh::CellHandle;
 
     auto vertices = std::vector<VertexHandle>();
     vertices.resize(38);
 
     for (auto i = 0u; i < 38; ++i)
-        vertices[i] = mesh.add_vertex(typename MeshT::PointT(0,0,0));
+        vertices[i] = mesh.add_vertex(HexHex::Vec3d(0,0,0));
 
-    mesh.set_vertex(VertexHandle(0), typename MeshT::PointT(-1,-1,1));
-    mesh.set_vertex(VertexHandle(18), typename MeshT::PointT(1,-1,1));
-    mesh.set_vertex(VertexHandle(12), typename MeshT::PointT(0,-1,-1));
+    mesh.set_vertex(VertexHandle(0), HexHex::Vec3d(-1,-1,1));
+    mesh.set_vertex(VertexHandle(18), HexHex::Vec3d(1,-1,1));
+    mesh.set_vertex(VertexHandle(12), HexHex::Vec3d(0,-1,-1));
     mesh.set_vertex(VertexHandle(2), 0.5*(mesh.vertex(vertices[0]) + mesh.vertex(vertices[18])));
     mesh.set_vertex(VertexHandle(6), 0.5*(mesh.vertex(vertices[0]) + mesh.vertex(vertices[12])));
     mesh.set_vertex(VertexHandle(14), 0.5*(mesh.vertex(vertices[12]) + mesh.vertex(vertices[18])));
@@ -398,7 +389,7 @@ void createPrism(MeshT& mesh, bool centeroffset = false, bool smaller = false)
     mesh.set_vertex(VertexHandle(16), 0.5*(mesh.vertex(vertices[15]) + mesh.vertex(vertices[5])));
 
     for (auto i = 0u; i < 19u; ++i)
-        mesh.set_vertex(VertexHandle(i+19), mesh.vertex(vertices[i])+typename MeshT::PointT(0,2,0));
+        mesh.set_vertex(VertexHandle(i+19), mesh.vertex(vertices[i])+HexHex::Vec3d(0,2,0));
 
     int a,b,c,d;
     for (auto i : {0u,6u})
@@ -423,50 +414,50 @@ void createPrism(MeshT& mesh, bool centeroffset = false, bool smaller = false)
     addCube(vertices[a], vertices[b], vertices[c], vertices[d], vertices[a+19], vertices[b+19], vertices[c+19], vertices[d+19], mesh, false);
 
 
-    auto params = std::vector<HexEx::Vec3d>(38,HexEx::Vec3d(-10,0,0));
+    auto params = std::vector<HexHex::Vec3d>(38,HexHex::Vec3d(-10,0,0));
 //    params.resize(38);
 
     for (auto i = 0u; i < 15; ++i)
     {
-        params[i] =    HexEx::Vec3d(-1+0.5*(i%3),-1,1-0.5*(i/3));
-        params[i+19] = HexEx::Vec3d(-1+0.5*(i%3),1,1-0.5*(i/3));
+        params[i] =    HexHex::Vec3d(-1+0.5*(i%3),-1,1-0.5*(i/3));
+        params[i+19] = HexHex::Vec3d(-1+0.5*(i%3),1,1-0.5*(i/3));
     }
 
-    auto params2 = std::vector<HexEx::Vec3d>(38,HexEx::Vec3d(-10,0,0));
+    auto params2 = std::vector<HexHex::Vec3d>(38,HexHex::Vec3d(-10,0,0));
 //    params2.resize(38);
-    params2[8] = HexEx::Vec3d(0,-1,0);
-    params2[5] = HexEx::Vec3d(0.5,-1,0);
-    params2[2] = HexEx::Vec3d(1,-1,0);
-    params2[11] = HexEx::Vec3d(0,-1,-0.5);
-    params2[16] = HexEx::Vec3d(0.5,-1,-0.5);
-    params2[17] = HexEx::Vec3d(1,-1,-0.5);
-    params2[14] = HexEx::Vec3d(0,-1,-1);
-    params2[15] = HexEx::Vec3d(0.5,-1,-1);
-    params2[18] = HexEx::Vec3d(1,-1,-1);
+    params2[8] = HexHex::Vec3d(0,-1,0);
+    params2[5] = HexHex::Vec3d(0.5,-1,0);
+    params2[2] = HexHex::Vec3d(1,-1,0);
+    params2[11] = HexHex::Vec3d(0,-1,-0.5);
+    params2[16] = HexHex::Vec3d(0.5,-1,-0.5);
+    params2[17] = HexHex::Vec3d(1,-1,-0.5);
+    params2[14] = HexHex::Vec3d(0,-1,-1);
+    params2[15] = HexHex::Vec3d(0.5,-1,-1);
+    params2[18] = HexHex::Vec3d(1,-1,-1);
 
     for (auto i : {2,8,5,11,16,17,14,15,18})
-        params2[i+19] = params2[i]+HexEx::Vec3d(0,2,0);
+        params2[i+19] = params2[i]+HexHex::Vec3d(0,2,0);
 
 
     if (smaller)
     {
         for (auto& p : params)
             if (p[1] > 0)
-                p += HexEx::Vec3d(0,-1,0);
+                p += HexHex::Vec3d(0,-1,0);
         for (auto& p : params2)
             if (p[1] > 0)
-                p += HexEx::Vec3d(0,-1,0);
+                p += HexHex::Vec3d(0,-1,0);
 
         for (auto v_it = mesh.vertices_begin(); v_it != mesh.vertices_end(); ++v_it)
           if (mesh.vertex(*v_it)[1] > 0)
-            mesh.set_vertex(*v_it, mesh.vertex(*v_it) + typename MeshT::PointT(0,-1,0));
+            mesh.set_vertex(*v_it, mesh.vertex(*v_it) + HexHex::Vec3d(0,-1,0));
     }
 
 
-    OpenVolumeMesh::CellPropertyT<std::map<VertexHandle, HexEx::Vec3d>> parameters = mesh.template request_cell_property<std::map<VertexHandle, HexEx::Vec3d>>("Parametrization");
+    HexHex::IGM parameters = mesh.request_cell_property<HexHex::CellIGM>("Parametrization");
     mesh.set_persistent(parameters);
 
-    HexEx::Vec3d offset = HexEx::Vec3d(0.0,0.0,0.0);
+    HexHex::Vec3d offset = HexHex::Vec3d(0.0,0.0,0.0);
 
     for (auto c_it = mesh.cells_begin(); c_it != mesh.cells_end(); ++c_it)
     {
@@ -487,127 +478,7 @@ void createPrism(MeshT& mesh, bool centeroffset = false, bool smaller = false)
 
 }
 
-template <typename MeshT>
-void createCuboidWithInvertedPart(MeshT& mesh, HexEx::Vec3d position, HexEx::Vec3d length, HexEx::Vec3d paramLength, int n_x, int n_y, int n_z, bool transition, double invertedStart, double invertedEnd)
-{
-//    using VertexHandle = OpenVolumeMesh::VertexHandle;
-//    using CellHandle   = OpenVolumeMesh::CellHandle;
-
-//    TetrahedralCuboidGenerator(mesh, position+0.5*length, length, n_x, n_y, n_z);
-//    invertedStart -= 0.0*length[0];
-//    invertedEnd   -= 0.0*length[0];
-
-//    OpenVolumeMesh::CellPropertyT<std::map<VertexHandle, HexEx::Vec3d>> parametrization = mesh.request_cell_property<std::map<OpenVolumeMesh::VertexHandle, HexEx::Vec3d>>("Parametrization");
-//    mesh.set_persistent(parametrization);
-
-//    HexEx::Vec3d offset = 0.0*length;
-//    HexEx::Vec3d offset4 = HexEx::Vec3d(0,0,length[2]);
-//    auto scaling = HexEx::Matrix4x4d();
-//    scaling.identity();
-//    for (unsigned int i = 0; i < 3; ++i)
-//        scaling(i,i) = paramLength[i]/length[i];
-
-//    for (auto ch_it = mesh.cells_begin(); ch_it != mesh.cells_end(); ++ch_it)
-//    {
-//        auto ch = *ch_it;
-//        auto vertices = mesh.get_cell_vertices(ch);
-//        auto transformation = HexEx::Matrix4x4dd();
-//        transformation.identity();
-//        if (transition)
-//            transformation = getRandomMatrix();
-
-//        auto cog = HexEx::Vec3d(0,0,0);
-//        for (auto vh : vertices)
-//            cog += mesh.vertex(vh);
-//        cog /= vertices.size();
-
-//        for (auto vh : vertices)
-//        {
-//            auto offset2 = HexEx::Vec3d(0,0,0);
-//            auto offset3 = HexEx::Vec3d(0,0,0);
-//            if (cog[0] > invertedStart && cog[0] < invertedEnd)
-//            {
-//                offset2 = HexEx::Vec3d(2*(invertedStart - mesh.vertex(vh)[0]),0,0);
-//                offset3 = HexEx::Vec3d(0,paramLength[1]+1,0);
-//            }
-//            else if (cog[0] >= invertedEnd)
-//            {
-//                offset2 = HexEx::Vec3d(2*(invertedStart - invertedEnd),0,0);
-//                offset3 = HexEx::Vec3d(0,2*(paramLength[1]+1),0);
-//            }
-
-//            parametrization[ch][vh] = transformation.transform_point(scaling.transform_point(mesh.vertex(vh)+offset+offset2))+offset3+offset4;
-//        }
-//    }
-
-}
-
-template <typename MeshT>
-void createCuboidWithInvertedHalf(MeshT& mesh, HexEx::Vec3d position, HexEx::Vec3d length, HexEx::Vec3d paramLength, int n_x, int n_y, int n_z, bool transition, double invertedMiddle, double invertedWidth)
-{
-//    using VertexHandle = OpenVolumeMesh::VertexHandle;
-//    using CellHandle   = OpenVolumeMesh::CellHandle;
-
-//    TetrahedralCuboidGenerator(mesh, position+0.5*length, length, n_x, n_y, n_z);
-
-//    OpenVolumeMesh::CellPropertyT<std::map<VertexHandle, HexEx::Vec3d>> parametrization = mesh.request_cell_property<std::map<OpenVolumeMesh::VertexHandle, HexEx::Vec3d>>("Parametrization");
-//    mesh.set_persistent(parametrization);
-
-//    HexEx::Vec3d offset = HexEx::Vec3d(0,0,length[2]+1);
-//    auto scaling = HexEx::Matrix4x4d();
-//    scaling.identity();
-//    for (unsigned int i = 0; i < 3; ++i)
-//        scaling(i,i) = paramLength[i]/length[i];
-
-//    for (auto ch_it = mesh.cells_begin(); ch_it != mesh.cells_end(); ++ch_it)
-//    {
-//        auto ch = *ch_it;
-//        auto vertices = mesh.get_cell_vertices(ch);
-//        auto transformation = HexEx::Matrix4x4dd();
-//        transformation.identity();
-//        if (transition)
-//            transformation = getRandomMatrix();
-
-
-//        for (auto vh : vertices)
-//        {
-//            auto pos = mesh.vertex(vh);
-//            if (pos[2] > 0.5*length[2])
-//            {
-//                double lambda = (pos[2]-0.5*length[2])/(0.5*length[2]);
-
-//                auto p = invertedMiddle;
-//                auto w = invertedWidth*lambda;
-//                auto dw = 2.0*w/3.0;
-
-
-//                auto p1 = p - w;
-//                auto p2 = p1 + dw;
-//                auto p3 = p1 + 2.0*dw;
-//                auto p4 = p + w;
-
-
-//                double alpha = (pos[0]-p1)/dw;
-//                double beta  = (pos[0]-p2)/dw;
-//                double gamma = (pos[0]-p3)/dw;
-
-//                if (alpha > 0 && alpha <= 1.0)
-//                    pos[0] = p + (2.0*w*alpha-w);
-//                else if (beta > 0 && beta <= 1.0)
-//                    pos[0] = p - (2.0*w*beta-w);
-//                else if (gamma > 0 && gamma <= 1.0)
-//                    pos[0] = p + (2.0*w*gamma-w);
-
-//            }
-//            parametrization[ch][vh] = 1/10000.0 * HexEx::roundVector(10000.0*(transformation.transform_point(scaling.transform_point(pos))+offset));
-////            parametrization[ch][vh] = (transformation.transform_point(scaling.transform_point(pos))+offset);
-//        }
-//    }
-
-}
-
-template <typename MeshT>
-void createCrazyCorner(MeshT& mesh, bool offsets)
+inline void createCrazyCorner(HexHex::TetrahedralMesh& mesh, bool offsets)
 {
     using VertexHandle = OpenVolumeMesh::VertexHandle;
     using CellHandle   = OpenVolumeMesh::CellHandle;
@@ -615,14 +486,14 @@ void createCrazyCorner(MeshT& mesh, bool offsets)
     auto vertices = std::vector<VertexHandle>();
 
     auto scale = 0.5;
-    vertices.push_back(mesh.add_vertex(scale * typename MeshT::PointT(   0,   0,   0)));
-    vertices.push_back(mesh.add_vertex(scale * typename MeshT::PointT(   0,   1,   1)));
-    vertices.push_back(mesh.add_vertex(scale * typename MeshT::PointT(  -1,   0,   0)));
-    vertices.push_back(mesh.add_vertex(scale * typename MeshT::PointT(-0.5,   0,   1)));
-    vertices.push_back(mesh.add_vertex(scale * typename MeshT::PointT( 0.5,   0,   1)));
-    vertices.push_back(mesh.add_vertex(scale * typename MeshT::PointT(   1,   0,   0)));
-    vertices.push_back(mesh.add_vertex(scale * typename MeshT::PointT( 0.5,   1,   0)));
-    vertices.push_back(mesh.add_vertex(scale * typename MeshT::PointT(-0.5,   1,   0)));
+    vertices.push_back(mesh.add_vertex(scale * HexHex::Vec3d(   0,   0,   0)));
+    vertices.push_back(mesh.add_vertex(scale * HexHex::Vec3d(   0,   1,   1)));
+    vertices.push_back(mesh.add_vertex(scale * HexHex::Vec3d(  -1,   0,   0)));
+    vertices.push_back(mesh.add_vertex(scale * HexHex::Vec3d(-0.5,   0,   1)));
+    vertices.push_back(mesh.add_vertex(scale * HexHex::Vec3d( 0.5,   0,   1)));
+    vertices.push_back(mesh.add_vertex(scale * HexHex::Vec3d(   1,   0,   0)));
+    vertices.push_back(mesh.add_vertex(scale * HexHex::Vec3d( 0.5,   1,   0)));
+    vertices.push_back(mesh.add_vertex(scale * HexHex::Vec3d(-0.5,   1,   0)));
 
     auto cells = std::vector<CellHandle>();
 
@@ -633,7 +504,7 @@ void createCrazyCorner(MeshT& mesh, bool offsets)
     cells.push_back(mesh.add_cell(vertices[0], vertices[6], vertices[7], vertices[1]));
     cells.push_back(mesh.add_cell(vertices[0], vertices[7], vertices[2], vertices[1]));
 
-    OpenVolumeMesh::CellPropertyT<std::map<VertexHandle, HexEx::Vec3d>> parametrization = mesh.template request_cell_property<std::map<OpenVolumeMesh::VertexHandle, HexEx::Vec3d>>("Parametrization");
+    HexHex::IGM parametrization = mesh.request_cell_property<HexHex::CellIGM>("Parametrization");
     mesh.set_persistent(parametrization);
 
     for (auto ch : cells)
@@ -643,20 +514,20 @@ void createCrazyCorner(MeshT& mesh, bool offsets)
                 if (vh == VertexHandle(3) || vh == VertexHandle(4))
                 {
                     auto pos = mesh.vertex(VertexHandle(3+(1-(vh.idx()-3))));
-                    HexEx::Vec3d pos2 = HexEx::Vec3d(pos[0], pos[1], pos[2]);
+                    HexHex::Vec3d pos2 = HexHex::Vec3d(pos[0], pos[1], pos[2]);
                     parametrization[ch][vh] = pos2;
                 }
                 else
                 {
                     auto pos = mesh.vertex(vh);
-                    HexEx::Vec3d pos2 = HexEx::Vec3d(pos[0], pos[1], pos[2]);
+                    HexHex::Vec3d pos2 = HexHex::Vec3d(pos[0], pos[1], pos[2]);
                     parametrization[ch][vh] = pos2;
                 }
             }
             else
             {
                 auto pos = mesh.vertex(vh);
-                HexEx::Vec3d pos2 = HexEx::Vec3d(pos[0], pos[1], pos[2]);
+                HexHex::Vec3d pos2 = HexHex::Vec3d(pos[0], pos[1], pos[2]);
                 parametrization[ch][vh] = pos2;
             }
 

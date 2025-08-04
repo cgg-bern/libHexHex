@@ -1,121 +1,113 @@
-/*
- * Copyright 2019 Computer Graphics Group, RWTH Aachen University
- * Author: Max Lyon <lyon@cs.rwth-aachen.de>
- *
- * This file is part of HexEx.
- *
- * HexEx is free software: you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free
- * Software Foundation, either version 3 of the License, or (at your
- * option) any later version.
- *
- * HexEx is distributed in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
- * for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with HexEx.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 #include <gtest/gtest.h>
 #include "common.hh"
-#include <DerivedExactPredicates.hh>
-#include <Direction.hh>
+#include <HexHex/HexExtractor.hh>
+#include <HexHex/Predicates/GeneratorPredicates.hh>
 
-using namespace HexEx;
+#include <OpenVolumeMesh/FileManager/FileManager.hh>
 
-TEST(Predicates, PointsIntoTriangleFromEdgeTest) {
-    using Vec3 = Vec3d;
-    using Direction = HexEx::Direction;
+using namespace HexHex;
 
-    auto u = Vec3(4,5,0);
-    auto v = Vec3(2,3,0);
-    auto w = Vec3(0,0,0);
-    auto p = Vec3(3,4,0);
-    auto dir = Direction(1,0,0);
-
-    EXPECT_TRUE(pointsIntoProjectedTriangleFromEdge(u,v,w,p,dir));
-
-}
-
-TEST(Predicates, PointsIntoTriangleFromEdgeTest2) {
-    using Vec3 = Vec3d;
-    using Direction = HexEx::Direction;
-
-    auto u = Vec3(2,0,0);
-    auto v = Vec3(2,0,2);
-    auto w = Vec3(4,0,0);
-    auto p = Vec3(2,0,1);
-
-    EXPECT_TRUE( pointsIntoProjectedTriangleFromEdge(u,v,w,p,Direction( 1, 0, 0)));
-    EXPECT_FALSE(pointsIntoProjectedTriangleFromEdge(u,v,w,p,Direction(-1, 0, 0)));
-    EXPECT_FALSE(pointsIntoProjectedTriangleFromEdge(u,v,w,p,Direction( 0, 1, 0)));
-    EXPECT_FALSE(pointsIntoProjectedTriangleFromEdge(u,v,w,p,Direction( 0,-1, 0)));
-    EXPECT_FALSE(pointsIntoProjectedTriangleFromEdge(u,v,w,p,Direction( 0, 0, 1)));
-    EXPECT_FALSE(pointsIntoProjectedTriangleFromEdge(u,v,w,p,Direction( 0, 0,-1)));
-
-}
-
-TEST(Predicates, PointsIntoTriangleFromEdgeTest3) {
-    using Vec3 = Vec3d;
-    using Direction = HexEx::Direction;
-
-    auto u = Vec3(4,0,0);
-    auto v = Vec3(2,0,0);
-    auto w = Vec3(0,0,0);
-    auto p = Vec3(3,0,0);
-    auto dir = Direction(1,0,0);
-
-    EXPECT_FALSE(pointsIntoProjectedTriangleFromEdge(u,v,w,p,dir));
-
-}
-
-
-TEST(Predicates, PointsIntoTriangleFromEdgeTest4) {
-    using Vec3 = Vec3d;
-    using Direction = HexEx::Direction;
-
-    auto u = Vec3(4,0,0);
-    auto v = Vec3(2,0,0);
-    auto w = Vec3(0,-1,0);
-    auto p = Vec3(3,0,0);
-    auto dir = Direction(1,0,0);
-
-    EXPECT_FALSE(pointsIntoProjectedTriangleFromEdge(u,v,w,p,dir));
-}
-
-
-
-TEST(Predicates, PointsIntoTriangleFromEdgeTest5) {
-    using Vec3 = Vec3d;
-    using Direction = HexEx::Direction;
-
-    auto u = Vec3(2,2,0);
-    auto v = Vec3(2,2,2);
-    auto w = Vec3(2,0,2);
-    auto p = Vec3(2,2,1);
-
-    EXPECT_FALSE(pointsIntoProjectedTriangleFromEdge(u,v,w,p,Direction( 1, 0, 0)));
-    EXPECT_FALSE(pointsIntoProjectedTriangleFromEdge(u,v,w,p,Direction(-1, 0, 0)));
-    EXPECT_FALSE(pointsIntoProjectedTriangleFromEdge(u,v,w,p,Direction( 0, 1, 0)));
-    EXPECT_TRUE( pointsIntoProjectedTriangleFromEdge(u,v,w,p,Direction( 0,-1, 0)));
-    EXPECT_FALSE(pointsIntoProjectedTriangleFromEdge(u,v,w,p,Direction( 0, 0, 1)));
-    EXPECT_FALSE(pointsIntoProjectedTriangleFromEdge(u,v,w,p,Direction( 0, 0,-1)));
-}
-
-TEST(Predicates, FaceIntersectionTest)
+void build_tet(TetrahedralMesh& mesh,
+              std::array<Vec3d,4> params
+              )
 {
-    using Vec3 = Vec3d;
+    mesh.clear();
 
-    auto u = Vec3(-1,0,-1);
-    auto v = Vec3(0,-1,-1);
-    auto w = Vec3(-1,-1,0);
-    auto start = Vec3(-1,0,-1);
-    auto end = Vec3(-1,0,0);
+    mesh.add_vertex(params[0]);
+    mesh.add_vertex(params[1]);
+    mesh.add_vertex(params[2]);
+    mesh.add_vertex(params[3]);
 
-    EXPECT_TRUE(HexEx::intersectsTriangleRelaxed(u,v,w,start,end));
+    mesh.add_cell(VertexHandle(0),VertexHandle(1),VertexHandle(2),VertexHandle(3));
 
 }
 
+TEST(Predicates, generatorIsVertexTest)
+{
+    TetrahedralMesh mesh;
+    std::array<Parameter, 4> params = {Vec3d(0, 0, 0),Vec3d(0, 0, 1),Vec3d(1, 0, 0),Vec3d(0, 1, 0)};
+    std::array<VertexHandle, 4> vhs = {VertexHandle(0),VertexHandle(1),VertexHandle(2),VertexHandle(3)};
+    build_tet(mesh, params);
 
+    TetMeshCache meshCache(mesh);
+    meshCache.build();
+
+    EXPECT_EQ(
+        computeVertexGeneratorElement(meshCache, CellHandle(0), vhs, params, Parameter(0,0,0)),
+        VertexHandle(0)
+        );
+
+    EXPECT_EQ(
+        computeVertexGeneratorElement(meshCache, CellHandle(0), vhs, params, Parameter(0,0,1)),
+        VertexHandle(1)
+        );
+
+    EXPECT_EQ(
+        computeVertexGeneratorElement(meshCache, CellHandle(0), vhs, params, Parameter(1,0,0)),
+        VertexHandle(2)
+        );
+
+    EXPECT_EQ(
+        computeVertexGeneratorElement(meshCache, CellHandle(0), vhs, params, Parameter(0,1,0)),
+        VertexHandle(3)
+        );
+}
+
+
+TEST(Predicates, generatorIsEdgeTest)
+{
+    TetrahedralMesh mesh;
+    std::array<Parameter, 4> params = {Vec3d(0, 0, 0),Vec3d(0, 0, 1),Vec3d(1, 0, 0),Vec3d(0, 1, 0)};
+    std::array<VertexHandle, 4> vhs = {VertexHandle(0),VertexHandle(1),VertexHandle(2),VertexHandle(3)};
+    build_tet(mesh, params);
+
+    TetMeshCache meshCache(mesh);
+    meshCache.build();
+
+    EXPECT_TRUE(computeVertexGeneratorElement(meshCache, CellHandle(0), vhs,
+                                              params, Parameter(0,0,0.2)).is_edge());
+    EXPECT_TRUE(computeVertexGeneratorElement(meshCache, CellHandle(0), vhs,
+                                              params, Parameter(0,0.9,0)).is_edge());
+    EXPECT_TRUE(computeVertexGeneratorElement(meshCache, CellHandle(0), vhs,
+                                              params, Parameter(0.01,0,0)).is_edge());
+    EXPECT_TRUE(computeVertexGeneratorElement(meshCache, CellHandle(0), vhs,
+                                              params, Parameter(0.5,0,0.5)).is_edge());
+    EXPECT_TRUE(computeVertexGeneratorElement(meshCache, CellHandle(0), vhs,
+                                              params, Parameter(0.25,0.75,0)).is_edge());
+    EXPECT_TRUE(computeVertexGeneratorElement(meshCache, CellHandle(0), vhs,
+                                              params, Parameter(0,0.75,0.25)).is_edge());
+}
+
+TEST(Predicates, generatorIsFaceTest)
+{
+    TetrahedralMesh mesh;
+    std::array<Parameter, 4> params = {Vec3d(0, 0, 0),Vec3d(0, 0, 1),Vec3d(1, 0, 0),Vec3d(0, 1, 0)};
+    std::array<VertexHandle, 4> vhs = {VertexHandle(0),VertexHandle(1),VertexHandle(2),VertexHandle(3)};
+    build_tet(mesh, params);
+
+    TetMeshCache meshCache(mesh);
+    meshCache.build();
+
+    EXPECT_TRUE(computeVertexGeneratorElement(meshCache, CellHandle(0), vhs,
+                                              params, Parameter(0.2,0,0.1)).is_face());
+    EXPECT_TRUE(computeVertexGeneratorElement(meshCache, CellHandle(0), vhs,
+                                              params, Parameter(0,0.4,0.1)).is_face());
+    EXPECT_TRUE(computeVertexGeneratorElement(meshCache, CellHandle(0), vhs,
+                                              params, Parameter(0.3,0,1e-9)).is_face());
+    EXPECT_TRUE(computeVertexGeneratorElement(meshCache, CellHandle(0), vhs,
+                                              params, Parameter(0.25,0.5,0.25)).is_face());
+}
+
+TEST(Predicates, generatorIsCellTest)
+{
+    TetrahedralMesh mesh;
+    std::array<Parameter, 4> params = {Vec3d(0, 0, 0),Vec3d(0, 0, 1),Vec3d(1, 0, 0),Vec3d(0, 1, 0)};
+    std::array<VertexHandle, 4> vhs = {VertexHandle(0),VertexHandle(1),VertexHandle(2),VertexHandle(3)};
+    build_tet(mesh, params);
+
+    TetMeshCache meshCache(mesh);
+    meshCache.build();
+
+    EXPECT_TRUE(computeVertexGeneratorElement(meshCache, CellHandle(0), vhs,
+                                              params, Parameter(0.3,0.2,0.1)).is_cell());
+}

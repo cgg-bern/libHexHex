@@ -13,3 +13,9 @@
 .cache
 external
 .DS_Store
+.idea/
+cmake-build*/
+
+# MSVC:
+.vs/
+out/

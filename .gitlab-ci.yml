@@ -1,38 +1,24 @@
-stages:
-  - build
+variables:
+  GIT_SUBMODULE_FORCE_HTTPS: "true" # rewrite git:// submodule urls to https
+  GIT_SUBMODULE_STRATEGY: recursive
+  GIT_SUBMODULE_UPDATE_FLAGS: --jobs 16
+  GIT_STRATEGY: clone # fetch is more efficient
 
-gcc-c++11:
-  stage: build
-  script: "CI/ci-linux.sh gcc C++11"
-  tags:
-    - Linux
 
-clang-c++11:
-  stage: build
-  script: "CI/ci-linux.sh clang C++11"
-  tags:
-    - Linux
+include:
+  - component: $CI_SERVER_FQDN/CGG-public/ci-components/debian-linux/debian@v0.0.9
+    inputs:
+      stage: build
+      debian_release: trixie
+      tags:
+        - cgg
+        - linux
+        - docker-docker
+  - component: $CI_SERVER_FQDN/CGG-public/ci-components/windows/vs22-cmake@v0.0.10
+    inputs:
+      stage: build
+      tags:
+        - cgg
+        - win25
+        - docker-windows
 
-gcc-c++14:
-  stage: build
-  script: "CI/ci-linux.sh gcc C++14"
-  tags:
-    - Linux
-
-clang-c++14:
-  stage: build
-  script: "CI/ci-linux.sh clang C++14"
-  tags:
-    - Linux
-
-macos-c++11:
-  stage: build
-  script: "CI/ci-mac.sh C++11"
-  tags:
-    - Apple
-
-macos-c++14:
-  stage: build
-  script: "CI/ci-mac.sh C++14"
-  tags:
-    - Apple

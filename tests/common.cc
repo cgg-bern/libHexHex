@@ -1,8 +1,8 @@
 #include "common.hh"
-
+#include <random>
 #include <iostream>
 
-bool check_that_all_halffaces_referenced_by_cells_exists(HexEx::TetrahedralMesh& mesh)
+bool check_that_all_halffaces_referenced_by_cells_exists(HexHex::TetrahedralMesh& mesh)
 {
   for (auto ch : mesh.cells())
   {
@@ -18,12 +18,12 @@ bool check_that_all_halffaces_referenced_by_cells_exists(HexEx::TetrahedralMesh&
   return true;
 }
 
-HexEx::Vec3d getRandomVector()
+HexHex::Vec3d getRandomVector(int absmax)
 {
     static std::default_random_engine e1(3);
-    static std::uniform_int_distribution<int> uniform_dist1(-10, 10);
+    static std::uniform_int_distribution<int> uniform_dist1(-absmax, absmax);
 
-    auto res = HexEx::Vec3d(0,0,0);
+    auto res = HexHex::Vec3d(0,0,0);
     for (unsigned int i = 0; i < 3; ++i)
         res[i] = uniform_dist1(e1);
 
@@ -31,12 +31,12 @@ HexEx::Vec3d getRandomVector()
 }
 
 
-HexEx::Vec3d getRandomVectorDouble()
+HexHex::Vec3d getRandomVectorDouble()
 {
     static std::default_random_engine e1(3);
     static std::uniform_real_distribution<double> uniform_dist1(-10, 10);
 
-    auto res = HexEx::Vec3d(0,0,0);
+    auto res = HexHex::Vec3d(0,0,0);
     for (unsigned int i = 0; i < 3; ++i)
         res[i] = uniform_dist1(e1);
 
@@ -44,7 +44,7 @@ HexEx::Vec3d getRandomVectorDouble()
 }
 
 
-HexEx::Matrix4x4d getRandomMatrix()
+HexHex::Matrix4x4d getRandomMatrix()
 {
     static std::default_random_engine e1(7);
     static std::default_random_engine e2(8);
@@ -54,7 +54,7 @@ HexEx::Matrix4x4d getRandomMatrix()
     auto value = uniform_dist1(e1)*2-1;
     auto pos   = uniform_dist2(e2);
 
-    auto res = HexEx::Matrix4x4d();
+    auto res = HexHex::Matrix4x4d();
     res.clear();
 
     res(0,pos) = value;

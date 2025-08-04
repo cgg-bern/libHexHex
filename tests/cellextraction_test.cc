@@ -1,30 +1,19 @@
 /*
- * Copyright 2019 Computer Graphics Group, RWTH Aachen University
- * Author: Max Lyon <lyon@cs.rwth-aachen.de>
+ * Copyright 2025 Computer Graphics Group, University of Bern - Tobias Kohler <tobias.kohler@unibe.ch>
+ * Copyright 2016 Computer Graphics Group, RWTH Aachen University - Max Lyon <lyon@cs.rwth-aachen.de>
  *
- * This file is part of HexEx.
- *
- * HexEx is free software: you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free
- * Software Foundation, either version 3 of the License, or (at your
- * option) any later version.
- *
- * HexEx is distributed in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
- * for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with HexEx.  If not, see <http://www.gnu.org/licenses/>.
+ * This file is part of HexHex.
  */
 
 #include <gtest/gtest.h>
+#include <OpenVolumeMesh/IO/ovmb_write.hh>
+#include <HexHex/Utils/FileAccessor.hh>
 #include "common.hh"
-#include <HexExtractor.hh>
+#include <HexHex/HexExtractor.hh>
 
 #include <OpenVolumeMesh/FileManager/FileManager.hh>
 
-using namespace HexEx;
+using namespace HexHex;
 
 TEST(CellExtraction, CellExtractionTest)
 {
@@ -41,12 +30,14 @@ TEST(CellExtraction, CellExtractionTest)
 
       EXPECT_EQ(8u, mesh.n_vertices());
 
-      OpenVolumeMesh::CellPropertyT<std::map<VertexHandle, HexEx::Vec3d>> parametrization = mesh.template request_cell_property<std::map<OpenVolumeMesh::VertexHandle, HexEx::Vec3d>>("Parametrization");
+      IGM parametrization = mesh.request_cell_property<CellIGM>("Parametrization");
       HexExtractor hexExtractor(mesh, parametrization);
-      hexExtractor.extract();
 
-      HexahedralMesh hexMesh;
-      hexExtractor.getHexMesh(hexMesh);
+      Config config;
+      config.verbose = false;
+      hexExtractor.extract(config);
+
+      HexahedralMesh& hexMesh = hexExtractor.getOutputMesh();
 
       unsigned int expectedNumberOfCells = size*size*size;
 
@@ -66,12 +57,14 @@ TEST(CellExtraction, CellExtractionMasterVertexTest)
   TetrahedralMesh mesh;
   createMasterVertexMesh(mesh);
 
-  OpenVolumeMesh::CellPropertyT<std::map<VertexHandle, HexEx::Vec3d>> parametrization = mesh.template request_cell_property<std::map<OpenVolumeMesh::VertexHandle, HexEx::Vec3d>>("Parametrization");
+  IGM parametrization = mesh.request_cell_property<CellIGM>("Parametrization");
   HexExtractor hexExtractor(mesh, parametrization);
-  hexExtractor.extract();
 
-  HexahedralMesh hexMesh;
-  hexExtractor.getHexMesh(hexMesh);
+  Config config;
+  config.verbose = false;
+  hexExtractor.extract(config);
+
+  HexahedralMesh& hexMesh = hexExtractor.getOutputMesh();
 
   unsigned int expectedNumberOfCells = 8;
 
@@ -84,16 +77,16 @@ TEST(CellExtraction, CellExtractionMasterVertexTest)
 
 TEST(CellExtraction, CellExtractionPrismTest)
 {
-
-
   TetrahedralMesh mesh;
   createPrism(mesh);
-  OpenVolumeMesh::CellPropertyT<std::map<VertexHandle, HexEx::Vec3d>> parametrization = mesh.template request_cell_property<std::map<OpenVolumeMesh::VertexHandle, HexEx::Vec3d>>("Parametrization");
+  IGM parametrization = mesh.request_cell_property<CellIGM>("Parametrization");
   HexExtractor hexExtractor(mesh, parametrization);
-  hexExtractor.extract();
 
-  HexahedralMesh hexMesh;
-  hexExtractor.getHexMesh(hexMesh);
+  Config config;
+  config.verbose = false;
+  hexExtractor.extract(config);
+
+  HexahedralMesh& hexMesh = hexExtractor.getOutputMesh();
 
   unsigned int expectedNumberOfCells = 6;
 
@@ -106,39 +99,41 @@ TEST(CellExtraction, CellExtractionPrismTest)
 
 void test_file(const std::string& _filename, size_t _n_expected_cells)
 {
+  // Test with 1 and 8 threads
+  for (uint nthreads : {1,8})
+  {
+      std::string filename = "testdata/" + _filename;
+      TetrahedralMesh tetMesh;
+      OVM::HalfFacePropertyT<Vec3d> igm = tetMesh.request_halfface_property<Vec3d>();
+      loadInputFromFile(filename, tetMesh, igm);
+      HexExtractor hexExtractor(tetMesh, igm);
 
-  std::string filename = "testdata/" + _filename + ".hexex";
-  HexExtractor hexExtractor(filename);
+      ASSERT_GT(hexExtractor.getInputMesh().n_cells(), 0) << "could not load mesh";
 
-  ASSERT_GT(hexExtractor.getInputMesh().n_cells(), 0) << "could not load mesh";
+      Config config;
+      config.verbose = false;
+      config.num_threads = nthreads;
+      hexExtractor.extract(config);
 
-  hexExtractor.extract();
+      HexahedralMesh& hexMesh = hexExtractor.getOutputMesh();
 
-  HexahedralMesh hexMesh;
-  hexExtractor.getHexMesh(hexMesh);
+      EXPECT_EQ(hexMesh.n_cells(), _n_expected_cells) << "Not correctly extracted";
 
-  EXPECT_EQ(hexMesh.n_cells(), _n_expected_cells) << "Not correctly extracted";
-
-  OpenVolumeMesh::IO::FileManager fileManager;
-  fileManager.writeFile("Results/" + _filename + ".ovm", hexMesh);
+      OpenVolumeMesh::IO::ovmb_write(("Results/" + _filename + ".ovmb").c_str(), hexMesh);
+  }
 }
 
-TEST(CellExtraction, CellExtractionFiveAdvancedTest)
+TEST(CellExtraction, CellExtractionS06U)
 {
-  test_file("fiveadvanced", 96);
+  test_file("s06u.hexex", 5167);
 }
 
-TEST(CellExtraction, CellExtractionFiveFineTest)
+TEST(CellExtraction, CellExtractionN08C)
 {
-  test_file("fiveFine", 4416);
+  test_file("n08c.hexex", 6368);
 }
 
-TEST(CellExtraction, CellExtractionSphereTest)
+TEST(CellExtraction, CellExtractionI11c)
 {
-  test_file("sphere", 216);
-}
-
-TEST(CellExtraction, CellExtractionCylinderTest)
-{
-  test_file("cylinderadvanced", 140);
+    test_file("i11c.hexex", 4982);
 }
