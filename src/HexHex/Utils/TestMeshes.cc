@@ -45,9 +45,9 @@ void createHexCube(HexahedralMesh& mesh)
     mesh.add_cell(hfhs);
 }
 
-TestMesh createCube(uint tetLength, uint hexLength)
+ParametrizedMesh createCube(uint tetLength, uint hexLength)
 {
-    TestMesh result;
+    ParametrizedMesh result;
     auto& mesh = result.mesh;
     auto& parameters = result.igm;
 
@@ -91,9 +91,9 @@ TestMesh createCube(uint tetLength, uint hexLength)
     return result;
 }
 
-TestMesh createCylinder(uint valence, uint hexScale)
+ParametrizedMesh createCylinder(uint valence, uint hexScale)
 {
-    TestMesh result;
+    ParametrizedMesh result;
     auto& mesh = result.mesh;
     auto& parameters = result.igm;
 
@@ -182,7 +182,7 @@ TestMesh createCylinder(uint valence, uint hexScale)
     return result;
 }
 
-void randomizeTransitions(TestMesh &tm)
+void randomizeTransitions(ParametrizedMesh &tm)
 {
 #pragma omp parallel
     {

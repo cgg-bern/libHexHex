@@ -97,16 +97,19 @@ TEST(CellExtraction, CellExtractionPrismTest)
 
 }
 
-void test_file(const std::string& _filename, size_t _n_expected_cells)
+void test_file(const std::filesystem::path& _filename, size_t _n_expected_cells)
 {
   // Test with 1 and 8 threads
   for (uint nthreads : {1,8})
   {
-      std::string filename = "testdata/" + _filename;
-      TetrahedralMesh tetMesh;
-      OVM::HalfFacePropertyT<Vec3d> igm = tetMesh.request_halfface_property<Vec3d>();
-      loadInputFromFile(filename, tetMesh, igm);
-      HexExtractor hexExtractor(tetMesh, igm);
+      std::filesystem::path testdata_in = "testdata/";
+      std::filesystem::path testdata_out = "Results/";
+
+      auto filename = testdata_in / _filename;
+
+      auto maybe_pmesh = loadInputFromFile(filename);
+      ASSERT_TRUE(maybe_pmesh.has_value());
+      HexExtractor hexExtractor(maybe_pmesh->mesh, maybe_pmesh->igm);
 
       ASSERT_GT(hexExtractor.getInputMesh().n_cells(), 0) << "could not load mesh";
 
@@ -119,7 +122,7 @@ void test_file(const std::string& _filename, size_t _n_expected_cells)
 
       EXPECT_EQ(hexMesh.n_cells(), _n_expected_cells) << "Not correctly extracted";
 
-      OpenVolumeMesh::IO::ovmb_write(("Results/" + _filename + ".ovmb").c_str(), hexMesh);
+      OpenVolumeMesh::IO::ovmb_write((testdata_out / _filename).replace_extension(".ovmb"), hexMesh);
   }
 }
 

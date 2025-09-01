@@ -25,6 +25,7 @@ add_library (HexHex
     HexHex/Utils/Utils.cc
     HexHex/Utils/TestMeshes.hh
     HexHex/Utils/csvfile.hh
+    HexHex/Utils/PropertyNames.cc
 
 
     HexHex/Predicates/ExactPredicates.hh

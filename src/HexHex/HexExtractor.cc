@@ -30,6 +30,7 @@
 
 #include <HexHex/Utils/FileAccessor.hh>
 #include <HexHex/Utils/Stopwatches.hh>
+#include <HexHex/Utils/PropertyNames.hh>
 #include <HexHex/Commons/Permutation.hh>
 
 #include <HexHex/Utils/MemoryUsage/MemoryUsage.hh>
@@ -435,9 +436,9 @@ void HexExtractor::transferFeatureTags()
     ScopedStopWatch _{sw::transferFeatureTags};
 
     // Vertex Properties
-    if (inputMesh.vertex_property_exists<int>("AlgoHex::FeatureVertices")) {
-        auto input_vfeature = inputMesh.get_vertex_property<int>("AlgoHex::FeatureVertices").value();
-        auto output_vfeature = outputMesh_->request_vertex_property<int>("AlgoHex::FeatureVertices");
+    if (inputMesh.vertex_property_exists<int>(PropertyNames::AlgoHexFeatureVertices)) {
+        auto input_vfeature = inputMesh.get_vertex_property<int>(PropertyNames::AlgoHexFeatureVertices).value();
+        auto output_vfeature = outputMesh_->request_vertex_property<int>(PropertyNames::AlgoHexFeatureVertices);
         outputMesh_->set_persistent(output_vfeature,true);
 
         #pragma omp parallel for num_threads(omp_get_max_threads())
@@ -451,9 +452,9 @@ void HexExtractor::transferFeatureTags()
     }
 
     // Edge Properties
-    if (inputMesh.edge_property_exists<int>("AlgoHex::FeatureEdges")) {
-        auto input_efeature = inputMesh.get_edge_property<int>("AlgoHex::FeatureEdges").value();
-        auto output_efeature = outputMesh_->request_edge_property<int>("AlgoHex::FeatureEdges");
+    if (inputMesh.edge_property_exists<int>(PropertyNames::AlgoHexFeatureEdges)) {
+        auto input_efeature = inputMesh.get_edge_property<int>(PropertyNames::AlgoHexFeatureEdges).value();
+        auto output_efeature = outputMesh_->request_edge_property<int>(PropertyNames::AlgoHexFeatureEdges);
         outputMesh_->set_persistent(output_efeature,true);
 
         #pragma omp parallel for num_threads(omp_get_max_threads())
@@ -470,9 +471,9 @@ void HexExtractor::transferFeatureTags()
     }
 
     // Face Properties
-    if (inputMesh.face_property_exists<int>("AlgoHex::FeatureFaces")) {
-        auto input_ffeature = inputMesh.get_face_property<int>("AlgoHex::FeatureFaces").value();
-        auto output_ffeature = outputMesh_->request_face_property<int>("AlgoHex::FeatureFaces");
+    if (inputMesh.face_property_exists<int>(PropertyNames::AlgoHexFeatureFaces)) {
+        auto input_ffeature = inputMesh.get_face_property<int>(PropertyNames::AlgoHexFeatureFaces).value();
+        auto output_ffeature = outputMesh_->request_face_property<int>(PropertyNames::AlgoHexFeatureFaces);
         outputMesh_->set_persistent(output_ffeature,true);
 
         #pragma omp parallel for num_threads(omp_get_max_threads())

@@ -52,7 +52,8 @@ void TetMeshCache::build()
     }
 
     // Cache Tet cells per vertex and vertex tet parent
-#pragma omp parallel for // default(none) shared(tetmesh, vertexCells, v_owners, std::cerr)
+    size_t n_isolated_vertices = 0;
+#pragma omp parallel for reduction(+:n_isolated_vertices)// default(none) shared(tetmesh, vertexCells, v_owners, std::cerr)
     for (int i = 0; i < static_cast<int>(tetmesh.n_vertices()); ++i)
     {
         VertexHandle vh(i);
@@ -65,7 +66,7 @@ void TetMeshCache::build()
         }
 
         if (chs.size()==0) {
-            std::cerr << "HexHex: Isolated Vertex" << std::endl;
+            ++n_isolated_vertices;
             continue;
         }
 
@@ -74,6 +75,9 @@ void TetMeshCache::build()
 
         // Set Vertex Cells
         vertexCells[vh] = std::move(chs);
+    }
+    if (n_isolated_vertices) {
+        std::cerr << "HexHex: WARNING: Found " << n_isolated_vertices << " isolated vertices." << std::endl;
     }
 }
 }
