@@ -1,6 +1,7 @@
 #include <HexHex/c_api.h>
 #include <HexHex/HexHex.hh>
 #include <HexHex/Utils/Typedefs.hh>
+#include <HexHex/Utils/PropertyNames.hh>
 
 namespace OVM = OpenVolumeMesh;
 
@@ -24,7 +25,7 @@ struct HexMesh HEXHEX_EXPORT hexhex_extract_simple(
     for (size_t i = 0; i < n_vertices; ++i) {
         mesh.add_vertex({vpos[3*i], vpos[3*i+1], vpos[3*i+2]});
     }
-    HFParam igm = mesh.request_halfface_property<Vec3d>("HexHex::Parametrization");
+    HFParam igm = mesh.request_halfface_property<Vec3d>(HexHex::PropertyNames::HexHexParam);
 
     using VH = OVM::VH;
     for (size_t tet = 0; tet < n_tets; ++tet) {

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <HexHex/Utils/Typedefs.hh>
+#include <HexHex/Utils/PropertyNames.hh>
 namespace HexHex
 {
 
@@ -15,7 +16,7 @@ struct ParametrizedMesh {
         mesh.set_persistent(igm);
     };
     TetrahedralMesh mesh;
-    HFParam igm = mesh.request_halfface_property<Vec3d>("HexHex::Parametrization");
+    HFParam igm = mesh.request_halfface_property<Vec3d>(HexHex::PropertyNames::HexHexParam);
 };
 
 } // namespace HexHex

@@ -7,6 +7,7 @@
 #include <OpenVolumeMesh/IO/PropertyCodecsT_impl.hh>
 #include <OpenVolumeMesh/IO/ovmb_read.hh>
 #include <HexHex/Utils/Utils.hh>
+#include <HexHex/Utils/PropertyNames.hh>
 
 #include <fstream>
 #include <iomanip>
@@ -96,7 +97,7 @@ static bool loadInputFromHEXEX(const std::filesystem::path& filename, Tetrahedra
     auto n_cells = 0u;
     is >> n_cells;
 
-    auto igm = tetmesh.request_halfface_property<Vec3d>("HexHex::Parametrization");
+    auto igm = tetmesh.request_halfface_property<Vec3d>(HexHex::PropertyNames::HexHexParam);
     tetmesh.set_persistent(igm, true);
 
     for (auto i = 0u; i < n_cells; ++i)
@@ -154,9 +155,11 @@ std::optional<ParametrizedMesh> loadInputFromFile(const std::filesystem::path& f
         std::cerr << "Input Error: Failed to load input mesh." << std::endl;
         return std::nullopt;
     }
-    auto igm = tetmesh.get_halfface_property<Vec3d>("HexHex::Parametrization");
+    auto igm = tetmesh.get_halfface_property<Vec3d>(HexHex::PropertyNames::HexHexParam);
     if (!igm.has_value()) {
-        std::cerr << "Input Error: Input tet mesh must have the property OVM::HalfFacePropertyT<Vec3d>(\"HexHex::Parametrization\")" << std::endl;
+        std::cerr << "Input Error: Input tet mesh must have the property OVM::HalfFacePropertyT<Vec3d>(\""
+            << HexHex::PropertyNames::HexHexParam
+            << "\")" << std::endl;
         return std::nullopt;
     }
     return ParametrizedMesh{std::move(tetmesh), std::move(*igm)};
