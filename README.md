@@ -60,10 +60,10 @@ In the igm property, each (non-boundary) halfface is expected to store the verte
 
 The function
 ```cpp
-bool successful_loading = HexHex::loadInputFromFile(filename, tetmesh, igm);
+std::optional<ParametrizedMesh> mesh = HexHex::loadInputFromFile(filename);
 ```
-can be used to load a tet mesh and igm from a .hexex file, .ovm file, or .ovmb file.
-If the mesh is loaded from a .ovm or .ovmb file, the mesh is expected to store the integer-grid map as a HalfFaceProperty<Vec3d>.
+can be used to load a tet mesh and IGM from a .hexex file, .ovm file, or .ovmb file.
+If the mesh is loaded from a .ovm or .ovmb file, the mesh is expected to store the integer-grid map as a `HalfFaceProperty<Vec3d>` named `HexHex::Parametrization`.
 
 
 ### Saving the Output to a File
