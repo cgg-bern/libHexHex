@@ -268,9 +268,11 @@ int main()
                   << ", epsilon = " << e.config.rasterization_epsilon
                   << std::endl;
 
-        TetrahedralMesh tetmesh;
-        OVM::HalfFacePropertyT<Vec3d> igm = tetmesh.request_halfface_property<Vec3d>("HexHex::Parametrization");
-        loadInputFromFile(ovmb_dir + e.in_file, tetmesh, igm);
+        auto maybe_inputmesh = loadInputFromFile(ovmb_dir + e.in_file);
+        if (!maybe_inputmesh.has_value()) {
+            std::cerr << "Failed to load input mesh " << e.in_file << std::endl;
+            return 1;
+        }
 
         Config config = e.config;
         config.verbose = false;
@@ -280,7 +282,7 @@ int main()
             ScopedStopWatch _{sw::root};
             sw::root.reset();
 
-            res = extractHexMesh(tetmesh, igm, config);
+            res = extractHexMesh(maybe_inputmesh->mesh, maybe_inputmesh->igm, config);
             if (!res.success) {
                 n_failures += 1;
                 max_failure_epsilon = std::max(max_failure_epsilon, config.rasterization_epsilon);

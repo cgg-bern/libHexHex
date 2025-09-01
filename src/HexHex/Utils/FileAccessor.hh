@@ -10,12 +10,13 @@
 
 #include <HexHex/Config/Export.hh>
 #include <HexHex/Utils/Typedefs.hh>
+#include <HexHex/Utils/ParametrizedMesh.hh>
 #include <filesystem>
 
 namespace HexHex
 {
 
-bool OVM_EXPORT loadInputFromFile(const std::filesystem::path& filename, TetrahedralMesh& tetmesh, OVM::HalfFacePropertyT<Vec3d>& igm);
+std::optional<ParametrizedMesh> OVM_EXPORT loadInputFromFile(const std::filesystem::path& filename);
 
 bool OVM_EXPORT saveInputToHEXEX(const std::filesystem::path& filename, const TetrahedralMesh& tetmesh, const OVM::HalfFacePropertyT<Vec3d>& igm);
 

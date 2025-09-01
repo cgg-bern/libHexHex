@@ -55,13 +55,13 @@ int main(int argc, char* argv[])
         config.num_threads = options.num_threads.value();
     }
 
-    HexHex::TetrahedralMesh tetmesh;
-    OVM::HalfFacePropertyT<HexHex::Vec3d> igm = tetmesh.request_halfface_property<HexHex::Vec3d>("HexHex::Parametrization");
     std::cout << "Load Input Tet Mesh from " << options.inTetFile << std::endl;
-    if (!HexHex::loadInputFromFile(options.inTetFile, tetmesh, igm)) {
+    auto maybe_inputmesh = HexHex::loadInputFromFile(options.inTetFile);
+    if (!maybe_inputmesh.has_value()) {
+        std::cerr << "Failed to load input mesh " << options.inTetFile << std::endl;
         return 1;
     }
-    auto res = HexHex::extractHexMesh(tetmesh, igm, config);
+    auto res = HexHex::extractHexMesh(maybe_inputmesh->mesh, maybe_inputmesh->igm, config);
 
     // Hex Mesh
     if (res.hex_mesh != nullptr) {

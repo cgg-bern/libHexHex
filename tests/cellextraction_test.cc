@@ -103,10 +103,9 @@ void test_file(const std::string& _filename, size_t _n_expected_cells)
   for (uint nthreads : {1,8})
   {
       std::string filename = "testdata/" + _filename;
-      TetrahedralMesh tetMesh;
-      OVM::HalfFacePropertyT<Vec3d> igm = tetMesh.request_halfface_property<Vec3d>();
-      loadInputFromFile(filename, tetMesh, igm);
-      HexExtractor hexExtractor(tetMesh, igm);
+      auto maybe_pmesh = loadInputFromFile(filename);
+      ASSERT_TRUE(maybe_pmesh.has_value());
+      HexExtractor hexExtractor(maybe_pmesh->mesh, maybe_pmesh->igm);
 
       ASSERT_GT(hexExtractor.getInputMesh().n_cells(), 0) << "could not load mesh";
 

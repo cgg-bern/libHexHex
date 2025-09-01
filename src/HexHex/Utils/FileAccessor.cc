@@ -30,37 +30,24 @@ inline Type get(const std::filesystem::path& filename)
 }
 }
 
-static bool loadInputFromOVM(const std::filesystem::path& filename, TetrahedralMesh& tetmesh, OVM::HalfFacePropertyT<Vec3d>& igm)
+static bool loadInputFromOVM(const std::filesystem::path& filename, TetrahedralMesh& tetmesh)
 {
     OpenVolumeMesh::IO::FileManager fm;
-    if (!fm.readFile(filename.string(), tetmesh)) {return false;}
-    auto prop = tetmesh.get_halfface_property<Vec3d>("HexHex::Parametrization");
-    if (!prop.has_value()) {
-        std::cerr << "Input Error: Tet mesh must have the property OVM::HalfFacePropertyT<Vec3d>(\"HexHex::Parametrization\")" << std::endl;
-        return false;
-    }
-    igm = prop.value();
-    return true;
+    return fm.readFile(filename.string(), tetmesh);
 }
 
-static bool loadInputFromOVMB(const std::filesystem::path& filename, TetrahedralMesh& tetmesh, OVM::HalfFacePropertyT<Vec3d>& igm)
+static bool loadInputFromOVMB(const std::filesystem::path& filename, TetrahedralMesh& tetmesh)
 {
     auto codecs = OVM::IO::g_default_property_codecs;
     auto res = OVM::IO::ovmb_read(filename, tetmesh, OVM::IO::ReadOptions(), codecs);
     if (res != OVM::IO::ReadResult::Ok) {
-        std::cerr << OVM::IO::to_string(res) << std::endl;
+        std::cerr << "OVMB reading failed: " << OVM::IO::to_string(res) << std::endl;
         return false;
     }
-    auto prop = tetmesh.get_halfface_property<Vec3d>("HexHex::Parametrization");
-    if (!prop.has_value()) {
-        std::cerr << "Input Error: Tet mesh must have the property OVM::HalfFacePropertyT<Vec3d>(\"HexHex::Parametrization\")" << std::endl;
-        return false;
-    }
-    igm = prop.value();
     return true;
 }
 
-static bool loadInputFromHEXEX(const std::filesystem::path& filename, TetrahedralMesh& tetmesh, OVM::HalfFacePropertyT<Vec3d>& igm)
+static bool loadInputFromHEXEX(const std::filesystem::path& filename, TetrahedralMesh& tetmesh)
 {
     std::ifstream is(filename, std::ifstream::in);
     if (!is.is_open()) {
@@ -109,6 +96,9 @@ static bool loadInputFromHEXEX(const std::filesystem::path& filename, Tetrahedra
     auto n_cells = 0u;
     is >> n_cells;
 
+    auto igm = tetmesh.request_halfface_property<Vec3d>("HexHex::Parametrization");
+    tetmesh.set_persistent(igm, true);
+
     for (auto i = 0u; i < n_cells; ++i)
     {
         // Read the 4 vertices
@@ -140,24 +130,36 @@ static bool loadInputFromHEXEX(const std::filesystem::path& filename, Tetrahedra
         igm[hfhs[0]] = param;
     }
     if (is.fail()) {
-        std::cout << ".hexex loading: iostream failbit is set!" << std::endl;
+        std::cerr << ".hexex loading: iostream failbit is set!" << std::endl;
         return false;
     }
     return true;
 }
 
-bool loadInputFromFile(const std::filesystem::path& filename, TetrahedralMesh& tetmesh, OVM::HalfFacePropertyT<Vec3d>& igm)
+std::optional<ParametrizedMesh> loadInputFromFile(const std::filesystem::path& filename)
 {
     auto ext = FileExtensions::get(filename);
+    TetrahedralMesh tetmesh;
 
+    bool success = true;
     switch (ext) {
-    case FileExtensions::OVM:  return loadInputFromOVM(filename, tetmesh, igm);
-    case FileExtensions::OVMB:  return loadInputFromOVMB(filename, tetmesh, igm);
-    case FileExtensions::HEXEX: return loadInputFromHEXEX(filename, tetmesh, igm);
-    default:
-        std::cerr << "Unknown Tet Mesh File Format!" << std::endl;
-        return false;
+        case FileExtensions::OVM:   success = loadInputFromOVM(filename, tetmesh); break;
+        case FileExtensions::OVMB:  success = loadInputFromOVMB(filename, tetmesh); break;
+        case FileExtensions::HEXEX: success = loadInputFromHEXEX(filename, tetmesh); break;
+        default:
+            std::cerr << "Input Error: Unknown Tet Mesh File Format!" << std::endl;
+            return std::nullopt;
     }
+    if (!success) {
+        std::cerr << "Input Error: Failed to load input mesh." << std::endl;
+        return std::nullopt;
+    }
+    auto igm = tetmesh.get_halfface_property<Vec3d>("HexHex::Parametrization");
+    if (!igm.has_value()) {
+        std::cerr << "Input Error: Input tet mesh must have the property OVM::HalfFacePropertyT<Vec3d>(\"HexHex::Parametrization\")" << std::endl;
+        return std::nullopt;
+    }
+    return ParametrizedMesh{std::move(tetmesh), std::move(*igm)};
 }
 
 bool saveInputToHEXEX(const std::filesystem::path& filename, const TetrahedralMesh& tetmesh, const OVM::HalfFacePropertyT<Vec3d>& igm)
