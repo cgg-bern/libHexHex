@@ -84,10 +84,26 @@ static bool loadInputFromHEXEX(const std::filesystem::path& filename, Tetrahedra
     auto n_vertices = 0u;
     is >> n_vertices;
 
+    auto read_dbl = [](std::istream &is) -> double {
+        // "is >> dbl" does not work with subnormal numbers (at least on MacOS libc++),
+        // use this as workaround.
+        std::string s;
+        is >> s;
+        return std::atof(s.c_str());
+    };
+    auto read_vec3d = [&read_dbl](std::istream &is) -> Vec3d {
+        auto x = read_dbl(is);
+        auto y = read_dbl(is);
+        auto z = read_dbl(is);
+        return Vec3d(x, y, z);
+    };
     for (unsigned int i = 0; i < n_vertices; ++i) {
         Position pos;
-        is >> pos;
-        tetmesh.add_vertex(pos);
+        tetmesh.add_vertex(read_vec3d(is));
+        if (is.fail()) {
+            std::cout << "reading .hexex failed after reading vertex " << i << std::endl;
+            return false;
+        }
     }
 
     auto n_cells = 0u;
@@ -122,6 +138,10 @@ static bool loadInputFromHEXEX(const std::filesystem::path& filename, Tetrahedra
         igm[hfhs[2]] = param;
         is >> param;
         igm[hfhs[0]] = param;
+    }
+    if (is.fail()) {
+        std::cout << ".hexex loading: iostream failbit is set!" << std::endl;
+        return false;
     }
     return true;
 }
