@@ -380,6 +380,7 @@ int main(int argc, char**argv)
 
             res = extractHexMesh(maybe_inputmesh->mesh, maybe_inputmesh->igm, config);
             if (!res.success) {
+                std::cout << "fail" << std::endl;
                 n_failures += 1;
                 max_failure_epsilon = std::max(max_failure_epsilon, config.rasterization_epsilon);
             }
