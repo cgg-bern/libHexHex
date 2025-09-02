@@ -227,7 +227,7 @@ std::vector<Experiment> getPreprocessingRecomputationExperiments()
 
 }
 
-int main()
+int main(int argc, char**argv)
 {
     using namespace HexHex::Experiments;
     using namespace HexHex;
@@ -239,8 +239,12 @@ int main()
     // he.saveInputTetMesh("/Users/tobiaskohler/Downloads/Cube.ovmb");
     // return 0;
 
-    std::string ovmb_dir = "/Users/tobiaskohler/Uni/HexHex/dataset/tet-ovmb/";
-    std::string json_file = "/Users/tobiaskohler/Uni/HexHex/evaluation/reports/hex2/TEMP.json";
+    if (argc != 3) {
+        std::cerr << "Usage: " << argv[0] << " <ovmb_dir> <out.json>" << std::endl;
+        return 1;
+    }
+    std::string ovmb_dir = argv[1]; // "/Users/tobiaskohler/Uni/HexHex/dataset/tet-ovmb/";
+    std::string json_file = argv[2]; // "/Users/tobiaskohler/Uni/HexHex/evaluation/reports/hex2/TEMP.json";
     std::vector<nlohmann::json> jsons;
 
     std::vector<Experiment> experiments = getRasterizationEpsilonExperiments();
