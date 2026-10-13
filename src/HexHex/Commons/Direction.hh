@@ -1,6 +1,7 @@
 #pragma once
 
 #include <HexHex/Utils/Typedefs.hh>
+#include <cstdint>
 
 namespace HexHex
 {
@@ -16,7 +17,7 @@ public:
     inline char axis() {return dir>>1;}
     Direction flipped() const {return Direction(dir^1);}
 
-    static inline std::array<std::array<char,4>,6> ORTHOGONAL_DIRECTIONS_PER_DIRECTION_CCW = {{
+    static inline std::array<std::array<int8_t,4>,6> ORTHOGONAL_DIRECTIONS_PER_DIRECTION_CCW = {{
         {2, 4, 3, 5},
         {2, 5, 3, 4},
         {0, 5, 1, 4},
@@ -24,7 +25,7 @@ public:
         {0, 2, 1, 3},
         {0, 3, 1, 2}
     }};
-    static inline std::array<std::array<char,6>,6> ORTHOGONAL_INDICES_PER_DIRECTION_CCW = {{
+    static inline std::array<std::array<int8_t,6>,6> ORTHOGONAL_INDICES_PER_DIRECTION_CCW = {{
         {-1, -1, 0, 2, 1, 3},
         {-1, -1, 0, 2, 3, 1},
         {0, 2, -1, -1, 3, 1},
