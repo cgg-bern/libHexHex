@@ -2,11 +2,12 @@
 
 #include <HexHex/Utils/Typedefs.hh>
 #include <HexHex/Utils/TetMeshCache.hh>
+#include <cstdint>
 
 namespace HexHex
 {
 
-enum MeshElementType : char {
+enum MeshElementType : int8_t {
     ELEMENT_NULL_TYPE = -1,
     ELEMENT_VERTEX_TYPE = 0,
     ELEMENT_EDGE_TYPE = 1,
