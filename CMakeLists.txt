@@ -50,7 +50,7 @@ option(HEXHEX_WITH_JEMALLOC "Build with jemalloc, enables precise memory measure
 
 
 include(FetchContent)
-set(FETCHCONTENT_UPDATES_DISCONNECTED TRUE)
+#set(FETCHCONTENT_UPDATES_DISCONNECTED TRUE)
 set(EXTERNAL_DIR "${CMAKE_CURRENT_SOURCE_DIR}/external")
 
 
