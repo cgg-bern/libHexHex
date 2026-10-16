@@ -12,8 +12,9 @@ namespace HexHex
 
     struct IntegerBoundingBox3d
     {
-        Vec3i min;
-        Vec3i max;
+        Vec3i min = Vec3i(0,0,0);
+        Vec3i max = Vec3i(0,0,0);
+
         inline bool empty()
         {
             return (max[0]<min[0])||(max[1]<min[1])||(max[2]<min[2]);

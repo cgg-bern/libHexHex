@@ -12,8 +12,7 @@ namespace HexHex
 class CellIGM
 {
 public:
-    CellIGM()
-    {}
+    CellIGM() {}
 
     inline Parameter& operator[](VertexHandle vh)
     {
@@ -52,7 +51,7 @@ public:
 
 private:
     std::array<VertexHandle, 4> vhs;
-    std::array<Parameter, 4> params;
+    std::array<Parameter, 4> params = {{{0,0,0},{0,0,0},{0,0,0},{0,0,0}}};
 
     inline bool hasValidVertices() const
     {
