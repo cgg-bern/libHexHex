@@ -270,10 +270,10 @@ private:
     std::vector<HalfEdgeHandle> globalPropellerHexHalfEdges;
 
     /* Output Hex Mesh Properties */
-    OVM::VertexPropertyT<GeneratorHandle> hexVertexGenerators = outputMesh_->request_vertex_property<GeneratorHandle>();
+    OVM::VertexPropertyT<GeneratorHandle> hexVertexGenerators = outputMesh_->request_vertex_property<GeneratorHandle>("", {});
     OVM::VertexPropertyT<int> hexVertexTetGeneratorTypes = outputMesh_->create_persistent_vertex_property<int>("v_tet_generator_type", -1).value();
     OVM::VertexPropertyT<int> hexVertexTetGeneratorIndices = outputMesh_->create_persistent_vertex_property<int>("v_tet_generator_index", -1).value();
-    OVM::HalfEdgePropertyT<LocalPropellerHandle> hexHalfEdgeLocalPropellers = outputMesh_->request_halfedge_property<LocalPropellerHandle>();
+    OVM::HalfEdgePropertyT<LocalPropellerHandle> hexHalfEdgeLocalPropellers = outputMesh_->request_halfedge_property<LocalPropellerHandle>("", {});
 
     size_t peak_memory_usage_bytes = 0;
 };

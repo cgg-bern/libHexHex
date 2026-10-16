@@ -18,14 +18,14 @@ PLMesh::PLMesh(TetMeshCache& cache, HexahedralMesh& hexmesh) :
 
     vertex_types(mesh.create_persistent_vertex_property<int>("v_type").value()),
 
-    uv_prop(mesh.create_persistent_vertex_property<Vec2d>("v_igm_uv").value()),
+    uv_prop(mesh.create_persistent_vertex_property<Vec2d>("v_igm_uv", Vec2d(0,0)).value()),
 
     edge_tet_generator_indices(mesh.create_persistent_edge_property<int>("e_tet_generator_index", -1).value()),
     edge_tet_generator_types(mesh.create_persistent_edge_property<int>("e_tet_generator_type", -1).value()),
 
     face_tet_generator_indices(mesh.create_persistent_face_property<int>("f_intersected_tet_index").value()),
 
-    hex_edge_ple_segments(hexmesh.request_edge_property<absl::flat_hash_map<CellHandle, MeshElement>>(""))
+    hex_edge_ple_segments(hexmesh.request_edge_property<absl::flat_hash_map<CellHandle, MeshElement>>("", {}))
 {
     // Some speedup
     mesh.enable_bottom_up_incidences(false);

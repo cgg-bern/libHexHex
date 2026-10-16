@@ -66,7 +66,7 @@ inline void createCube(HexHex::TetrahedralMesh& mesh, double parametrizationSide
     c.push_back(vhs[1]);
     chs.push_back(mesh.add_cell(c));
 
-    HexHex::IGM parametrization = mesh.request_cell_property<HexHex::CellIGM>("Parametrization");
+    HexHex::IGM parametrization = mesh.request_cell_property<HexHex::CellIGM>("Parametrization", {});
     mesh.set_persistent(parametrization);
 
     HexHex::Vec3d offset = HexHex::Vec3d(0.0,0.0,0.0);
@@ -167,7 +167,7 @@ inline void createCubeWithTransition(HexHex::TetrahedralMesh& mesh, double param
     c.push_back(vhs[1]);
     chs.push_back(mesh.add_cell(c));
 
-    HexHex::IGM parametrization = mesh.request_cell_property<HexHex::CellIGM>("Parametrization");
+    HexHex::IGM parametrization = mesh.request_cell_property<HexHex::CellIGM>("Parametrization", {});
     mesh.set_persistent(parametrization);
 
     HexHex::Vec3d offset = HexHex::Vec3d(2.0,0.0,0.0);
@@ -290,7 +290,7 @@ inline void createMasterVertexMesh(HexHex::TetrahedralMesh& mesh, bool centerOff
     addCube(lmmo, mmm, mmh, lmho, lom, mom, moh, loh, mesh, false);
     addCube(mmm, rmmh, rmh, mmh, mom, romh, roh, moh, mesh, true);
 
-    HexHex::IGM parametrization = mesh.request_cell_property<HexHex::CellIGM>("Parametrization");
+    HexHex::IGM parametrization = mesh.request_cell_property<HexHex::CellIGM>("Parametrization", {});
     mesh.set_persistent(parametrization);
 
     HexHex::Vec3d offset = HexHex::Vec3d(0.0,0.0,0.0);
@@ -454,7 +454,7 @@ inline void createPrism(HexHex::TetrahedralMesh& mesh, bool centeroffset = false
     }
 
 
-    HexHex::IGM parameters = mesh.request_cell_property<HexHex::CellIGM>("Parametrization");
+    HexHex::IGM parameters = mesh.request_cell_property<HexHex::CellIGM>("Parametrization", {});
     mesh.set_persistent(parameters);
 
     HexHex::Vec3d offset = HexHex::Vec3d(0.0,0.0,0.0);
@@ -504,7 +504,7 @@ inline void createCrazyCorner(HexHex::TetrahedralMesh& mesh, bool offsets)
     cells.push_back(mesh.add_cell(vertices[0], vertices[6], vertices[7], vertices[1]));
     cells.push_back(mesh.add_cell(vertices[0], vertices[7], vertices[2], vertices[1]));
 
-    HexHex::IGM parametrization = mesh.request_cell_property<HexHex::CellIGM>("Parametrization");
+    HexHex::IGM parametrization = mesh.request_cell_property<HexHex::CellIGM>("Parametrization", {});
     mesh.set_persistent(parametrization);
 
     for (auto ch : cells)

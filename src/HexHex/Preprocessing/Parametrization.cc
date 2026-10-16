@@ -9,19 +9,19 @@ namespace HexHex
 Parametrization::Parametrization(TetMeshCache &cache, HexahedralMesh &hexmesh) :
     cache(cache),
 
-    tetVertexCellParameters(cache.tetmesh.create_private_cell_property<CellIGM>()),
+    tetVertexCellParameters(cache.tetmesh.create_private_cell_property<CellIGM>("", {})),
 
-    transitions(cache.tetmesh.create_private_halfface_property<Transition>()),
+    transitions(cache.tetmesh.create_private_halfface_property<Transition>("", Transition::IDENTITY)),
 
     edgeSingularity(cache.tetmesh.create_private_edge_property<bool>()),
 
     edgeHasIncidentNonIdentityTransitions(cache.tetmesh.create_private_edge_property<bool>()),
 
-    igmsParam2World(cache.tetmesh.create_private_cell_property<std::pair<Matrix4x4d,bool>>()),
-    igmsWorld2Param(cache.tetmesh.create_private_cell_property<std::pair<Matrix4x4d,bool>>()),
+    igmsParam2World(cache.tetmesh.create_private_cell_property<std::pair<Matrix4x4d,bool>>("", {})),
+    igmsWorld2Param(cache.tetmesh.create_private_cell_property<std::pair<Matrix4x4d,bool>>("", {})),
 
-    hexVertexPerParameterInCell(cache.tetmesh.create_private_cell_property<absl::flat_hash_map<Parameter, VertexHandle>>()),
-    parameterInCellPerHexVertex(hexmesh.request_vertex_property<FlatMap<CellHandle, Parameter>>())
+    hexVertexPerParameterInCell(cache.tetmesh.create_private_cell_property<absl::flat_hash_map<Parameter, VertexHandle>>("", {})),
+    parameterInCellPerHexVertex(hexmesh.request_vertex_property<FlatMap<CellHandle, Parameter>>("", {}))
 {}
 
 Matrix4x4d Parametrization::calculateMap(const CellHandle& ch)

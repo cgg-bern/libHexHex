@@ -30,7 +30,7 @@ TEST(CellExtraction, CellExtractionTest)
 
       EXPECT_EQ(8u, mesh.n_vertices());
 
-      IGM parametrization = mesh.request_cell_property<CellIGM>("Parametrization");
+      IGM parametrization = mesh.request_cell_property<CellIGM>("Parametrization", {});
       HexExtractor hexExtractor(mesh, parametrization);
 
       Config config;
@@ -57,7 +57,7 @@ TEST(CellExtraction, CellExtractionMasterVertexTest)
   TetrahedralMesh mesh;
   createMasterVertexMesh(mesh);
 
-  IGM parametrization = mesh.request_cell_property<CellIGM>("Parametrization");
+  IGM parametrization = mesh.request_cell_property<CellIGM>("Parametrization", {});
   HexExtractor hexExtractor(mesh, parametrization);
 
   Config config;
@@ -79,7 +79,7 @@ TEST(CellExtraction, CellExtractionPrismTest)
 {
   TetrahedralMesh mesh;
   createPrism(mesh);
-  IGM parametrization = mesh.request_cell_property<CellIGM>("Parametrization");
+  IGM parametrization = mesh.request_cell_property<CellIGM>("Parametrization", {});
   HexExtractor hexExtractor(mesh, parametrization);
 
   Config config;
