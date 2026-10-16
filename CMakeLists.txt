@@ -28,11 +28,11 @@ project (HexHexSuperproject
     LANGUAGES CXX C
     HOMEPAGE_URL http://github.com/cgg-bern/libHexHex
     )
-set(CMAKE_CXX_STANDARD 20)
 
 if( ${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_SOURCE_DIR} )
     set(HEXHEX_STANDALONE_BUILD TRUE)
     message("Configuring HexHex as standalone project...")
+    set(CMAKE_CXX_STANDARD 20)
 else()
     set(HEXHEX_STANDALONE_BUILD FALSE)
     message("Configuring HexHex inside another cmake project...")
