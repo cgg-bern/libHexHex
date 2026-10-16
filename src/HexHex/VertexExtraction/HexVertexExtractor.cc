@@ -47,7 +47,7 @@ namespace HexHex
         e_igps(hexEx.inputMesh.create_private_edge_property<std::vector<Parameter>>()),
         f_igps(hexEx.inputMesh.create_private_face_property<std::vector<Parameter>>()),
         c_igps(hexEx.inputMesh.create_private_cell_property<std::vector<Parameter>>()),
-        piInv(hexEx.inputMesh.create_private_cell_property<Permutation>()),
+        piInv(hexEx.inputMesh.create_private_cell_property<Permutation>("", {})),
         tet_debug_props(hexEx.inputMesh.create_private_cell_property<std::vector<Parameter>>())
     {}
 
@@ -117,7 +117,7 @@ namespace HexHex
 
         tet_debug_props.fill(tet_debug_props.def());
 
-        auto bb_per_cell_permuted = inputMesh.create_private_cell_property<IntegerBoundingBox3d>();
+        auto bb_per_cell_permuted = inputMesh.create_private_cell_property<IntegerBoundingBox3d>("", {});
 
         // =========================
         // Rasterization Functions
