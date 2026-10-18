@@ -23,6 +23,10 @@ struct HexMesh HEXHEX_EXPORT hexhex_extract_simple(
         const double *tet_igm         // length: 3 * 4 * n_cells
         );
 
+// Frees the buffers allocated by hexhex_extract_simple. Must be called on every
+// HexMesh returned by that function to avoid memory leaks.
+void HEXHEX_EXPORT hexhex_free_hex_mesh(struct HexMesh *hm);
+
 #ifdef __cplusplus
 }
 #endif

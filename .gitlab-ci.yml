@@ -5,20 +5,69 @@ variables:
   GIT_STRATEGY: clone # fetch is more efficient
 
 
-include:
-  - component: $CI_SERVER_FQDN/CGG-public/ci-components/debian-linux/debian@v0.0.9
-    inputs:
-      stage: build
-      debian_release: trixie
-      tags:
-        - cgg
-        - linux
-        - docker-docker
-  - component: $CI_SERVER_FQDN/CGG-public/ci-components/windows/vs22-cmake@v0.0.10
-    inputs:
-      stage: build
-      tags:
-        - cgg
-        - win25
-        - docker-windows
+stages: [build]
 
+include:
+  - component: $CI_SERVER_FQDN/CGG-public/ci-components/cmake-cxx/debian@v0.1.0
+    inputs:
+      job_name: debian-trixie-x64
+      stage: build
+      src_folder: .
+      debian_release: trixie
+      enable_ctest: true
+
+  - component: $CI_SERVER_FQDN/CGG-public/ci-components/cmake-cxx/debian@v0.1.0
+    inputs:
+      job_name: debian-forky-x64
+      stage: build
+      src_folder: .
+      debian_release: forky
+      enable_ctest: true
+
+  # Sanitizer + coverage variants on clang instead of gcc:
+  # - ubsan fails to compile with gcc, which rejects abseil's constexpr
+  #   comparison of a function pointer against nullptr once -fsanitize=undefined
+  #   is active ("'TypeErasedApplyToSlotFn<...> == 0' is not a constant
+  #   expression"): https://github.com/abseil/abseil-cpp/issues/1634 (open,
+  #   deprioritized; root cause gcc PR 71962,
+  #   https://gcc.gnu.org/bugzilla/show_bug.cgi?id=71962).
+  # - gcc's coverage job crashed gcov:
+  #   https://gitlab.inf.unibe.ch/CGG-public/libHexHex/-/jobs/38814. The clang
+  #   variant uses llvm-cov gcov (the component follows CC) and works, verified
+  #   locally with clang 21 + gcovr.
+  - component: $CI_SERVER_FQDN/CGG-public/ci-components/cmake-cxx/debian@v0.1.0
+    inputs:
+      job_name: debian-forky-x64-clang
+      stage: build
+      src_folder: .
+      debian_release: forky
+      C_COMPILER: clang
+      CXX_COMPILER: clang++
+      enable_ctest: true
+      enable_asan: true
+      enable_ubsan: true
+      enable_coverage: true
+
+  - component: $CI_SERVER_FQDN/CGG-public/ci-components/cmake-cxx/macos@v0.1.0
+    inputs:
+      job_name: macos-golden-gate
+      stage: build
+      src_folder: .
+      macos_release: golden-gate
+      enable_ctest: true
+
+  - component: $CI_SERVER_FQDN/CGG-public/ci-components/cmake-cxx/windows@v0.1.0
+    inputs:
+      job_name: windows-vs2026
+      stage: build
+      src_folder: .
+      msvc_release: vs2026
+      enable_ctest: true
+
+  - component: $CI_SERVER_FQDN/CGG-public/ci-components/cmake-cxx/windows@v0.1.0
+    inputs:
+      job_name: windows-vs2022
+      stage: build
+      src_folder: .
+      msvc_release: vs2022
+      enable_ctest: true

@@ -69,4 +69,14 @@ struct HexMesh HEXHEX_EXPORT hexhex_extract_simple(
     return hm;
 }
 
+void HEXHEX_EXPORT hexhex_free_hex_mesh(HexMesh *hm)
+{
+    ::free(hm->vpos);
+    ::free(hm->hex_vertices);
+    hm->vpos = nullptr;
+    hm->hex_vertices = nullptr;
+    hm->n_vertices = 0;
+    hm->n_hexes = 0;
+}
+
 }
