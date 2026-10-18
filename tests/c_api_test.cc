@@ -44,5 +44,7 @@ TEST(c_api, basic)
 
     EXPECT_EQ(hm.n_vertices, 4*4*4);
     EXPECT_EQ(hm.n_hexes, 3*3*3);
+
+    ::hexhex_free_hex_mesh(&hm);
 }
 
